@@ -3,7 +3,7 @@ const express = require('express');
 const morgan = require('morgan');
 const path = require('path');
 const fs = require('fs');
-const configViewEngine = require('./config/viewEngine');
+const configViewEngine = require('./configs/viewEngine');
 const webRoute = require('./routes/web_router');
 
 const app = express();

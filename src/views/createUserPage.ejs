@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DBS401 - Add New User</title>
+    <!-- Add google fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sansation:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap"
+        rel="stylesheet">
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/modals.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Additional specific styles for the add user form */
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: var(--secondary);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px -15px rgba(2, 12, 27, 0.7);
+            border: 1px solid rgba(100, 255, 218, 0.1);
+        }
+
+        .form-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .form-header h2 {
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-header p {
+            color: var(--text-secondary);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(100, 255, 218, 0.1);
+        }
+
+        .security-icon {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body class="sansation-regular">
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo sansation-bold">DBS<span>401</span></div>
+        <ul class="nav-links sansation-regular">
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle">Users <i class="fas fa-chevron-down"></i></a>
+                <div class="dropdown-menu">
+                    <a href="/user/list" class="dropdown-item">Users Table</a>
+                    <a href="/user/add" class="dropdown-item">Add User</a>
+                </div>
+            </li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle">Resources <i class="fas fa-chevron-down"></i></a>
+                <div class="dropdown-menu">
+                    <a href="https://nodejs.org/docs/latest/api/documentation.html"
+                        class="dropdown-item">Documentation</a>
+                    <a href="https://www.w3schools.com/nodejs/" class="dropdown-item">Tutorials</a>
+                    <a href="https://nodejs.org/en/download" class="dropdown-item">Downloads</a>
+                </div>
+            </li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle">Profile <i class="fas fa-chevron-down"></i></a>
+                <div class="dropdown-menu">
+                    <a href="/user/profile" class="dropdown-item">My Account</a>
+                    <a href="/logout" class="dropdown-item">Logout</a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content Section -->
+    <section class="section" style="padding-top: 8rem;">
+        <div class="section-header">
+            <h2 class="section-title sansation-bold">Add New User</h2>
+        </div>
+
+        <div class="form-container">
+            <div class="form-header">
+                <h2><i class="fas fa-user-plus"></i> New User Registration</h2>
+                <p>Enter the user details below to add them to the secure database.</p>
+            </div>
+
+            <form id="addUserForm" action="/user/add" method="POST">
+                <!-- Name and Gender row -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="name">Full Name <span style="color: var(--accent);">*</span></label>
+                        <input type="text" id="name" name="name" placeholder="Enter full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="gender">Gender <span style="color: var(--accent);">*</span></label>
+                        <select id="gender" name="gender" required>
+                            <option value="" disabled selected>Select gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Contact Information row -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="phone">Phone Number <span style="color: var(--accent);">*</span></label>
+                        <input type="tel" id="phone" name="phone" placeholder="Enter phone number" required
+                            pattern="[0-9]{10,15}">
+                        <small style="color: var(--text-secondary);">Format: 10-15 digits with no spaces or special
+                            characters</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="birthdate">Birthdate <span style="color: var(--accent);">*</span></label>
+                        <input type="date" id="birthdate" name="birthdate" required>
+                    </div>
+                </div>
+
+                <!-- Address row -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="address">Address <span style="color: var(--accent);">*</span></label>
+                        <input type="text" id="address" name="address" placeholder="Enter full address" required>
+                    </div>
+                </div>
+
+                <!-- Hobbies row -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="hobbies">Hobbies</label>
+                        <input type="text" id="hobbies" name="hobbies" placeholder="E.g., Reading, Swimming, Chess">
+                        <small style="color: var(--text-secondary);">Separate multiple hobbies with commas</small>
+                    </div>
+                </div>
+
+                <!-- Form Action Buttons -->
+                <div class="form-footer">
+                    <div class="security-icon">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Data securely encrypted</span>
+                    </div>
+                    <div>
+                        <button type="button" class="cancel-btn"
+                            onclick="window.location.href='/user/list'">Cancel</button>
+                        <button type="submit" class="save-btn">Add User</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="logo sansation-bold" style="margin-bottom: 1rem;">DBS<span>401</span></div>
+        <ul class="footer-links">
+            <li><a href="#"><i class="fab fa-twitter"></i></a></li>
+            <li><a href="#"><i class="fab fa-linkedin"></i></a></li>
+            <li><a href="#"><i class="fab fa-github"></i></a></li>
+            <li><a href="#"><i class="fab fa-discord"></i></a></li>
+        </ul>
+        <p>© 2023 Database Security 401. All rights reserved.</p>
+        <p class="security-note"><i class="fas fa-shield-alt"></i> This page implements DBS401 security standards</p>
+    </footer>
+
+    <!-- Dropdown Menu Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const dropdowns = document.querySelectorAll('.dropdown');
+
+            // Toggle dropdown on click
+            dropdowns.forEach(dropdown => {
+                const toggleBtn = dropdown.querySelector('.dropdown-toggle');
+
+                toggleBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    dropdown.classList.toggle('active');
+                    dropdown.querySelector('.dropdown-menu').classList.toggle('show');
+
+                    // Close other dropdowns
+                    dropdowns.forEach(otherDropdown => {
+                        if (otherDropdown !== dropdown && otherDropdown.classList.contains('active')) {
+                            otherDropdown.classList.remove('active');
+                            otherDropdown.querySelector('.dropdown-menu').classList.remove('show');
+                        }
+                    });
+                });
+            });
+
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function (e) {
+                if (!e.target.closest('.dropdown')) {
+                    dropdowns.forEach(dropdown => {
+                        dropdown.classList.remove('active');
+                        dropdown.querySelector('.dropdown-menu').classList.remove('show');
+                    });
+                }
+            });
+
+            // Form validation
+            const form = document.getElementById('addUserForm');
+            form.addEventListener('submit', function (e) {
+                let isValid = true;
+                const name = document.getElementById('name').value.trim();
+                const phone = document.getElementById('phone').value.trim();
+                const address = document.getElementById('address').value.trim();
+
+                // Basic validation
+                if (name.length < 2) {
+                    alert('Name must be at least 2 characters long');
+                    isValid = false;
+                }
+
+                if (phone.length < 10 || phone.length > 15 || !/^\d+$/.test(phone)) {
+                    alert('Phone number must be 10-15 digits with no spaces or special characters');
+                    isValid = false;
+                }
+
+                if (address.length < 5) {
+                    alert('Please enter a valid address');
+                    isValid = false;
+                }
+
+                if (!isValid) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
