@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DBS401 - User List</title>
+    <!-- Add google fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sansation:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap"
+        rel="stylesheet">
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/tables.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="sansation-regular">
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo sansation-bold">DBS<span>401</span></div>
+        <ul class="nav-links sansation-regular">
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle">Users <i class="fas fa-chevron-down"></i></a>
+                <div class="dropdown-menu">
+                    <a href="/user/list" class="dropdown-item">Users Table</a>
+                    <a href="#" class="dropdown-item">Update Users</a>
+                    <a href="#" class="dropdown-item">Add User</a>
+                </div>
+            </li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle">Resources <i class="fas fa-chevron-down"></i></a>
+                <div class="dropdown-menu">
+                    <a href="#" class="dropdown-item">Documentation</a>
+                    <a href="#" class="dropdown-item">Tutorials</a>
+                    <a href="#" class="dropdown-item">Downloads</a>
+                </div>
+            </li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle">Contact <i class="fas fa-chevron-down"></i></a>
+                <div class="dropdown-menu">
+                    <a href="#" class="dropdown-item">Support</a>
+                    <a href="#" class="dropdown-item">Feedback</a>
+                    <a href="#" class="dropdown-item">Get in Touch</a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- User Table Section -->
+    <section class="section data-section">
+        <div class="section-header">
+            <h2 class="section-title sansation-bold">User Information</h2>
+            <div class="controls-container">
+                <div class="search-box">
+                    <input type="text" id="userSearch" placeholder="Search users...">
+                    <button type="button"><i class="fas fa-search"></i></button>
+                </div>
+                <div class="filter-controls">
+                    <select id="genderFilter" class="filter-select">
+                        <option value="">All Genders</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                    <button class="export-btn"><i class="fas fa-download"></i> Export</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="data-container">
+            <div class="data-summary">
+                <div class="summary-card">
+                    <i class="fas fa-users"></i>
+                    <div class="summary-content">
+                        <h3>Total Users</h3>
+                        <p class="summary-number">
+                            <%= listUser && listUser.rows ? listUser.rows.length : 0 %>
+                        </p>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <i class="fas fa-user-shield"></i>
+                    <div class="summary-content">
+                        <h3>Security Level</h3>
+                        <p class="summary-text">Maximum</p>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <i class="fas fa-database"></i>
+                    <div class="summary-content">
+                        <h3>Last Updated</h3>
+                        <p class="summary-text">
+                            <%= new Date().toLocaleDateString() %>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="users_table">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-id-card"></i> ID</th>
+                            <th><i class="fas fa-user"></i> Name</th>
+                            <th><i class="fas fa-map-marker-alt"></i> Address</th>
+                            <th><i class="fas fa-phone"></i> Phone Number</th>
+                            <th><i class="fas fa-heart"></i> Hobbies</th>
+                            <th><i class="fas fa-calendar-alt"></i> Birthdate</th>
+                            <th><i class="fas fa-venus-mars"></i> Gender</th>
+                            <th><i class="fas fa-cogs"></i> Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if(listUser && listUser.rows) { %>
+                            <% listUser.rows.forEach(user=> { %>
+                                <tr>
+                                    <td><span class="id-badge">
+                                            <%= user[1] %>
+                                        </span></td>
+                                    <td>
+                                        <%= user[2] %>
+                                    </td>
+                                    <td>
+                                        <%= user[3] %>
+                                    </td>
+                                    <td>
+                                        <span class="phone-number">
+                                            <i class="fas fa-phone-alt"></i>
+                                            <span class="phone-value masked">
+                                                <span class="masked-value">•••••••••••</span>
+                                                <span class="actual-value" style="display: none;">
+                                                    <%= user[4] %>
+                                                </span>
+                                            </span>
+                                            <button class="toggle-visibility" title="Show/Hide Phone Number">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <%= user[5] %>
+                                    </td>
+                                    <td>
+                                        <%= new Date(user[7]).toLocaleDateString() %>
+                                    </td>
+                                    <td>
+                                        <span class="gender-badge <%= user[8].toLowerCase() %>">
+                                            <i
+                                                class="fas fa-<%= user[8].toLowerCase() === 'female' ? 'venus' : 'mars' %>"></i>
+                                            <%= user[8] %>
+                                        </span>
+                                    </td>
+                                    <td class="actions-cell">
+                                        <button class="action-btn view-btn" title="View Details"><i
+                                                class="fas fa-eye"></i></button>
+                                        <button class="action-btn edit-btn" title="Edit User"><i
+                                                class="fas fa-edit"></i></button>
+                                        <button class="action-btn delete-btn" title="Delete User"><i
+                                                class="fas fa-trash-alt"></i></button>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                                    <% } else { %>
+                                        <tr>
+                                            <td colspan="8" class="no-data">
+                                                <i class="fas fa-database"></i>
+                                                <p>No user data found in the secure database</p>
+                                            </td>
+                                        </tr>
+                                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination">
+                <button class="pagination-btn"><i class="fas fa-chevron-left"></i></button>
+                <button class="pagination-btn active">1</button>
+                <button class="pagination-btn">2</button>
+                <button class="pagination-btn">3</button>
+                <button class="pagination-btn"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="logo sansation-bold" style="margin-bottom: 1rem;">DBS<span>401</span></div>
+        <ul class="footer-links">
+            <li><a href="#"><i class="fab fa-twitter"></i></a></li>
+            <li><a href="#"><i class="fab fa-linkedin"></i></a></li>
+            <li><a href="#"><i class="fab fa-github"></i></a></li>
+            <li><a href="#"><i class="fab fa-discord"></i></a></li>
+        </ul>
+        <p>© 2023 Database Security 401. All rights reserved.</p>
+        <p class="security-note"><i class="fas fa-shield-alt"></i> This page implements DBS401 security standards</p>
+    </footer>
+
+    <!-- Dropdown Menu Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const dropdowns = document.querySelectorAll('.dropdown');
+
+            // Toggle dropdown on click
+            dropdowns.forEach(dropdown => {
+                const toggleBtn = dropdown.querySelector('.dropdown-toggle');
+
+                toggleBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    dropdown.classList.toggle('active');
+                    dropdown.querySelector('.dropdown-menu').classList.toggle('show');
+
+                    // Close other dropdowns
+                    dropdowns.forEach(otherDropdown => {
+                        if (otherDropdown !== dropdown && otherDropdown.classList.contains('active')) {
+                            otherDropdown.classList.remove('active');
+                            otherDropdown.querySelector('.dropdown-menu').classList.remove('show');
+                        }
+                    });
+                });
+            });
+
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function (e) {
+                if (!e.target.closest('.dropdown')) {
+                    dropdowns.forEach(dropdown => {
+                        dropdown.classList.remove('active');
+                        dropdown.querySelector('.dropdown-menu').classList.remove('show');
+                    });
+                }
+            });
+        });
+    </script>
+
+    <!-- Simple JavaScript for interactivity -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('userSearch');
+            const genderFilter = document.getElementById('genderFilter');
+            const tableRows = document.querySelectorAll('#users_table tbody tr');
+
+            // Search functionality
+            searchInput.addEventListener('input', filterTable);
+            genderFilter.addEventListener('change', filterTable);
+
+            function filterTable() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const genderValue = genderFilter.value;
+
+                tableRows.forEach(row => {
+                    const name = row.cells[1].textContent.toLowerCase();
+                    const gender = row.cells[6].textContent.trim();
+
+                    const matchesSearch = name.includes(searchTerm);
+                    const matchesGender = genderValue === '' || gender.includes(genderValue);
+
+                    if (matchesSearch && matchesGender) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            }
+
+            // Highlight row on hover
+            tableRows.forEach(row => {
+                row.addEventListener('mouseover', function () {
+                    this.classList.add('highlight');
+                });
+
+                row.addEventListener('mouseout', function () {
+                    this.classList.remove('highlight');
+                });
+            });
+
+            // Phone number visibility toggle
+            document.querySelectorAll('.toggle-visibility').forEach(button => {
+                button.addEventListener('click', function () {
+                    const phoneContainer = this.parentElement;
+                    const maskedValue = phoneContainer.querySelector('.masked-value');
+                    const actualValue = phoneContainer.querySelector('.actual-value');
+                    const eyeIcon = this.querySelector('i');
+
+                    if (maskedValue.style.display === 'none') {
+                        // Show masked value, hide actual value
+                        maskedValue.style.display = '';
+                        actualValue.style.display = 'none';
+                        eyeIcon.classList.remove('fa-eye-slash');
+                        eyeIcon.classList.add('fa-eye');
+                    } else {
+                        // Hide masked value, show actual value
+                        maskedValue.style.display = 'none';
+                        actualValue.style.display = '';
+                        eyeIcon.classList.remove('fa-eye');
+                        eyeIcon.classList.add('fa-eye-slash');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

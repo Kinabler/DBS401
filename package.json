@@ -1,0 +1,30 @@
+{
+  "name": "dbs401",
+  "version": "1.0.0",
+  "description": "DBS401 Project",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon ./src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kinabler/DBS401.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Kinabler/DBS401/issues"
+  },
+  "homepage": "https://github.com/Kinabler/DBS401#readme",
+  "dependencies": {
+    "dotenv": "16.5.0",
+    "ejs": "3.1.10",
+    "express": "5.1.0",
+    "fs": "0.0.1-security",
+    "morgan": "1.10.0",
+    "nodemon": "3.1.10",
+    "oracledb": "6.8.0",
+    "path": "0.12.7"
+  }
+}

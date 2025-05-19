@@ -1,0 +1,206 @@
+/* Button Styles */
+.cta-button {
+    display: inline-block;
+    background: transparent;
+    color: var(--accent);
+    padding: 0.75rem 1.25rem;
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.cta-button:hover {
+    background: rgba(100, 255, 218, 0.1);
+    transform: translateY(-3px);
+}
+
+/* Card Styles */
+.cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.card {
+    background-color: var(--secondary);
+    border-radius: 8px;
+    padding: 1.5rem;
+    transition: transform 0.3s ease;
+    border: 1px solid rgba(100, 255, 218, 0.1);
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 30px -15px rgba(2, 12, 27, 0.7);
+}
+
+.card-icon {
+    color: var(--accent);
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.card-title {
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.card-content {
+    color: var(--text-secondary);
+}
+
+/* Badge Styles */
+.security-badges {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.security-badge {
+    background-color: rgba(100, 255, 218, 0.1);
+    color: var(--accent);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid var(--accent);
+    font-weight: 500;
+}
+
+.gender-badge {
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.gender-badge.male {
+    background-color: rgba(52, 152, 219, 0.2);
+    color: #3498db;
+}
+
+.gender-badge.female {
+    background-color: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+}
+
+/* Timeline Components */
+.timeline {
+    margin: 2rem 0;
+    position: relative;
+}
+
+.timeline-item {
+    padding: 1.5rem;
+    background: var(--secondary);
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+    border-left: 3px solid var(--accent);
+    position: relative;
+}
+
+.timeline-date {
+    color: var(--accent);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.timeline-title {
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+.pagination-btn {
+    min-width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--secondary);
+    color: var(--text-primary);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.pagination-btn:hover {
+    background-color: rgba(100, 255, 218, 0.1);
+    color: var(--accent);
+}
+
+.pagination-btn.active {
+    background-color: var(--accent);
+    color: var(--primary);
+}
+
+/* Decorative Elements */
+.cyber-graphic {
+    position: relative;
+    width: 300px;
+    height: 300px;
+}
+
+.hexagon {
+    position: absolute;
+    width: 100px;
+    height: 115px;
+    background-color: rgba(100, 255, 218, 0.05);
+    border: 1px solid var(--accent);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    animation: float 6s infinite ease-in-out;
+}
+
+.hexagon:nth-child(1) {
+    top: 50px;
+    left: 50px;
+    animation-delay: 0s;
+}
+
+.hexagon:nth-child(2) {
+    top: 100px;
+    left: 120px;
+    animation-delay: -2s;
+}
+
+.hexagon:nth-child(3) {
+    top: 160px;
+    left: 70px;
+    animation-delay: -4s;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0) rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(-15px) rotate(5deg);
+    }
+}
+
+.security-note {
+    margin-top: 1rem;
+    color: var(--accent);
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}

@@ -1,0 +1,59 @@
+* {
+    margin: 0px;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary: #0a192f;
+    --secondary: #112240;
+    --accent: #64ffda;
+    --text-primary: #ccd6f6;
+    --text-secondary: #8892b0;
+    --danger: #e63946;
+    --success: #2a9d8f;
+    --warning: #e9c46a;
+}
+
+body {
+    background-color: var(--primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+
+/* Font Sansation */
+.sansation-light {
+    font-family: "Sansation", sans-serif;
+    font-weight: 300;
+    font-style: normal;
+}
+
+.sansation-regular {
+    font-family: "Sansation", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.sansation-bold {
+    font-family: "Sansation", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+}
+
+.sansation-light-italic {
+    font-family: "Sansation", sans-serif;
+    font-weight: 300;
+    font-style: italic;
+}
+
+.sansation-regular-italic {
+    font-family: "Sansation", sans-serif;
+    font-weight: 400;
+    font-style: italic;
+}
+
+.sansation-bold-italic {
+    font-family: "Sansation", sans-serif;
+    font-weight: 700;
+    font-style: italic;
+}
