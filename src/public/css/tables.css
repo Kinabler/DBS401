@@ -114,12 +114,14 @@
     margin-bottom: 2rem;
 }
 
-/* Table styles */
+/* Table styles - improved alignment */
 #users_table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
     background-color: transparent;
+    table-layout: fixed;
+    /* Add fixed layout for consistent column widths */
 }
 
 #users_table th {
@@ -132,6 +134,12 @@
     letter-spacing: 1px;
     position: relative;
     border-bottom: 2px solid var(--accent);
+    text-align: left;
+    /* Ensure left alignment */
+    white-space: nowrap;
+    /* Prevent text wrapping in headers */
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 #users_table th i {
@@ -142,7 +150,63 @@
     padding: 0.75rem 1rem;
     border-bottom: 1px solid rgba(100, 255, 218, 0.05);
     vertical-align: middle;
+    text-align: left;
+    /* Ensure left alignment */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
+    /* Allow breaking words in content */
 }
+
+/* Set specific column widths for better alignment */
+#users_table th:nth-child(1),
+#users_table td:nth-child(1) {
+    width: 8%;
+}
+
+/* ID */
+#users_table th:nth-child(2),
+#users_table td:nth-child(2) {
+    width: 15%;
+}
+
+/* Name */
+#users_table th:nth-child(3),
+#users_table td:nth-child(3) {
+    width: 20%;
+}
+
+/* Address */
+#users_table th:nth-child(4),
+#users_table td:nth-child(4) {
+    width: 15%;
+}
+
+/* Phone */
+#users_table th:nth-child(5),
+#users_table td:nth-child(5) {
+    width: 15%;
+}
+
+/* Hobbies */
+#users_table th:nth-child(6),
+#users_table td:nth-child(6) {
+    width: 10%;
+}
+
+/* Birthdate */
+#users_table th:nth-child(7),
+#users_table td:nth-child(7) {
+    width: 8%;
+}
+
+/* Gender */
+#users_table th:nth-child(8),
+#users_table td:nth-child(8) {
+    width: 9%;
+}
+
+/* Actions */
 
 #users_table tr:last-child td {
     border-bottom: none;
@@ -240,4 +304,25 @@
 .toggle-visibility:hover {
     color: var(--accent);
     background-color: rgba(100, 255, 218, 0.05);
+}
+
+/* Enhanced responsive table behavior */
+@media (max-width: 992px) {
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    #users_table {
+        min-width: 900px;
+        /* Ensure minimum width for smaller screens */
+        table-layout: auto;
+        /* Switch to auto layout on smaller screens */
+    }
+
+    /* Reset column widths for mobile scroll view */
+    #users_table th,
+    #users_table td {
+        width: auto !important;
+    }
 }

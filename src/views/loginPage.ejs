@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - User Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/login.css">
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <div class="brand-name">DBS401 SYSTEM</div>
+            <h1>Welcome Back!</h1>
+            <p>Please sign in to continue</p>
+        </div>
+
+        <div class="login-icon pulse">
+            <i class="fas fa-user-lock"></i>
+        </div>
+
+        <div class="login-form">
+            <% if (locals.errorMessage) { %>
+                <div class="error-message">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <%= errorMessage %>
+                </div>
+                <% } %>
+
+                    <form action="/login" method="POST" class="needs-validation" novalidate>
+                        <div class="form-floating mb-3 position-relative">
+                            <i class="fas fa-user input-icon"></i>
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Username"
+                                required>
+                            <label for="username">Username</label>
+                            <div class="invalid-feedback">
+                                Please enter your username.
+                            </div>
+                        </div>
+
+                        <div class="form-floating mb-4 position-relative">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input type="password" class="form-control" id="password" name="password"
+                                placeholder="Password" required>
+                            <label for="password">Password</label>
+                            <div class="invalid-feedback">
+                                Please enter your password.
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-login">
+                            <i class="fas fa-sign-in-alt me-2"></i> Sign In
+                        </button>
+                    </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Form validation
+        (function () {
+            'use strict'
+            const forms = document.querySelectorAll('.needs-validation');
+
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+    </script>
+</body>
+
+</html>

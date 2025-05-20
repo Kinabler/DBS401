@@ -1,0 +1,188 @@
+:root {
+    /* Updated color scheme to match homepage */
+    --primary-color: #007bff;
+    --secondary-color: #0056b3;
+    --accent-color: #2196f3;
+    --text-color: #2d3748;
+    --light-color: #f8f9fa;
+}
+
+body {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 20px;
+    overflow: hidden;
+    position: relative;
+}
+
+body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><circle cx="20" cy="20" r="20" fill="rgba(255,255,255,0.03)"/><circle cx="80" cy="80" r="30" fill="rgba(255,255,255,0.04)"/><circle cx="50" cy="50" r="15" fill="rgba(255,255,255,0.02)"/></svg>');
+    background-size: 100px 100px;
+    opacity: 0.5;
+    z-index: -1;
+}
+
+.login-container {
+    width: 420px;
+    padding: 0;
+    background-color: rgba(255, 255, 255, 0.92);
+    border-radius: 16px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.login-header {
+    text-align: center;
+    padding: 25px 20px 10px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+    color: white;
+    border-radius: 10px 10px 0 0;
+}
+
+.login-header h1 {
+    font-size: 28px;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.login-header p {
+    margin-bottom: 0;
+    opacity: 0.9;
+    font-size: 14px;
+}
+
+.login-icon {
+    background: white;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto -40px;
+    position: relative;
+    top: -40px;
+    border: 5px solid var(--primary-color);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    color: var(--primary-color);
+    font-size: 40px;
+}
+
+.login-form {
+    padding: 30px 30px 40px;
+}
+
+.form-floating {
+    margin-bottom: 20px;
+}
+
+.form-floating .form-control {
+    padding-left: 40px;
+    border-radius: 30px;
+    height: 54px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.form-floating label {
+    padding-left: 40px;
+}
+
+.input-icon {
+    position: absolute;
+    left: 15px;
+    top: 17px;
+    color: var(--primary-color);
+    z-index: 5;
+}
+
+.btn-login {
+    width: 100%;
+    padding: 12px;
+    border-radius: 30px;
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 10px;
+    background-image: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+    border: none;
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-login:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    background-image: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+}
+
+.btn-login:active {
+    transform: translateY(1px);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.error-message {
+    color: #e74c3c;
+    background-color: rgba(231, 76, 60, 0.1);
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    text-align: center;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(0, 123, 255, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(0, 123, 255, 0);
+    }
+}
+
+.form-floating>.form-control:focus~label,
+.form-floating>.form-control:not(:placeholder-shown)~label {
+    transform: scale(.85) translateY(-0.5rem) translateX(0.15rem);
+    padding-left: 36px;
+}
+
+.brand-name {
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: white;
+    font-size: 18px;
+    margin-bottom: 10px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}

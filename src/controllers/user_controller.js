@@ -1,5 +1,6 @@
 const e = require('express');
 const { getUserFromDB, getUserByIdInDB, updateUserInDB } = require('../services/CRUD_service');
+const { authenticateUser } = require('../services/auth_service');
 
 const getHomePage = async (req, res) => {
     res.render('homePage');
@@ -15,28 +16,38 @@ const getListUserPage = async (req, res) => {
 }
 
 const postEditUserById = async (req, res) => {
-    const { id } = req.params;
     try {
-        // Here you would typically update the user in the database
-        // For now, we'll just log the data to the console
-        console.log(`Editing user with ID: ${id}`);
-        console.log('Form data:', req.body);
+        const { id } = req.params;
+        const { name, address, phone, hobbies, birthdate, gender, userId } = req.body;
 
-        const result = await getUserByIdInDB(id);
-        console.log('Current user data:', result);
+        console.log('Form data received:', req.body);
+        console.log('User ID from params:', id, 'User ID from form:', userId);
 
-        // Update the user in database with new data from form data
-        const resultUpdate = await updateUserInDB(req.body);
-        if (resultUpdate.rowsAffected === 0) {
-            console.log('Update failed: No rows affected');
-        }
-        console.log('User updated successfully:', resultUpdate);
+        // Create the data object for updating
+        const userData = {
+            profile_id: id || userId,  // Use param ID or form ID
+            full_name: name,
+            address: address,
+            phone_number: phone,
+            hobbies: hobbies,
+            birthday: new Date(birthdate),  // Ensure proper date format
+            gender: gender.trim()  // Trim any whitespace
+        };
 
-        // Redirect back to the list user page
+        // Log the prepared data
+        console.log('Data being sent to update service:', userData);
+
+        // Call the update service
+        const result = await updateUserInDB(userData);
+
+        // Log the result
+        console.log('Update completed:', result);
+
+        // Redirect back to the user list
         res.redirect('/user/list');
     } catch (error) {
-        console.error('Error editing user:', error);
-        res.status(500).send('Error processing your request');
+        console.error('Error in edit user:', error);
+        res.status(500).send(`Error processing your request: ${error.message}`);
     }
 };
 
@@ -44,20 +55,51 @@ const getAddUserPage = async (req, res) => {
     res.render('createUserPage');
 };
 
-const postAddUser = async (req, res) => {
+const getLoginPage = async (req, res) => {
+    res.render('loginPage', { errorMessage: null });
+};
+
+// Add logout handler
+const logout = async (req, res) => {
+    // Clear the auth token cookie
+    res.clearCookie('auth_token');
+    // Redirect to login page
+    res.redirect('/login');
+};
+
+const postLogin = async (req, res) => {
     try {
-        const { name, address, phone, hobbies, birthdate, gender } = req.body;
+        const { username, password } = req.body;
 
-        // Here you would call a service to add the user to the database
-        // For example: const result = await addUserToDB(name, address, phone, hobbies, birthdate, gender);
+        // Validate input
+        if (!username || !password) {
+            return res.render('loginPage', { errorMessage: 'Username and password are required' });
+        }
 
-        console.log('Adding new user:', req.body);
+        // Basic input sanitization
+        const sanitizedUsername = username.trim();
+        const sanitizedPassword = password.trim();
 
-        // Redirect to the user list page after successful addition
-        res.redirect('/user/list');
+        // Check credentials and get JWT token
+        const result = await authenticateUser(sanitizedUsername, sanitizedPassword);
+
+        if (result.success) {
+            // Set JWT token in cookie
+            res.cookie('auth_token', result.token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production', // Set to true in production
+                maxAge: 3600000 // 1 hour
+            });
+
+            // Redirect to home page or dashboard
+            return res.redirect('/');
+        } else {
+            // Authentication failed
+            return res.render('loginPage', { errorMessage: result.message });
+        }
     } catch (error) {
-        console.error('Error adding user:', error);
-        res.status(500).send('Error processing your request');
+        console.error('Login error:', error);
+        res.render('loginPage', { errorMessage: 'An error occurred during login' });
     }
 };
 
@@ -67,5 +109,7 @@ module.exports = {
     getListUserPage,
     postEditUserById,
     getAddUserPage,
-    postAddUser,
+    getLoginPage,
+    postLogin,
+    logout, // Export the new logout function
 };

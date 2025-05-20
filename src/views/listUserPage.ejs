@@ -33,7 +33,7 @@
                 <a href="#" class="dropdown-toggle">Users <i class="fas fa-chevron-down"></i></a>
                 <div class="dropdown-menu">
                     <a href="/user/list" class="dropdown-item">Users Table</a>
-                    <a href="/user/add" class="dropdown-item">Add User</a>
+                    <a href="/user/create" class="dropdown-item">Add User</a>
                 </div>
             </li>
             <li class="dropdown">
@@ -393,7 +393,13 @@
                     const phone = row.querySelector('.actual-value').textContent.trim();
                     const hobbies = row.cells[4].textContent.trim();
                     const birthdate = row.cells[5].textContent.trim();
-                    const gender = row.cells[6].textContent.trim();
+
+                    // Get clean gender value (removing any extra spaces or icons)
+                    let genderText = row.cells[6].textContent.trim();
+                    // Extract just "Male" or "Female" from the text
+                    let gender = genderText.includes('Male') ? 'Male' : 'Female';
+
+                    console.log('Extracted gender:', gender);
 
                     // Fill the modal form with user data
                     document.getElementById('userId').value = userId;
@@ -413,8 +419,9 @@
                         console.error("Error formatting date:", e);
                     }
 
-                    // Set gender select value
-                    document.getElementById('gender').value = gender.trim();
+                    // Explicitly set gender select value
+                    document.getElementById('gender').value = gender;
+                    console.log('Setting gender select to:', gender);
 
                     // Set form action
                     document.getElementById('editUserForm').setAttribute('action', `/user/edit/${userId}`);

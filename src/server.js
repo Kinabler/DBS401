@@ -3,6 +3,7 @@ const express = require('express');
 const morgan = require('morgan');
 const path = require('path');
 const fs = require('fs');
+const cookieParser = require('cookie-parser'); // Add cookie-parser require
 const configViewEngine = require('./configs/viewEngine');
 const webRoute = require('./routes/web_router');
 
@@ -15,9 +16,13 @@ const port = process.env.PORT || 8081;
 // Config view engine
 configViewEngine(app, express);
 
+// Serve static files
+app.use(express.static(path.join(__dirname, '../public')));
+
 // Express Json config
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser()); // Add cookie parser middleware
 
 // Ensure logs directory exists
 const logsDir = './src/logs';

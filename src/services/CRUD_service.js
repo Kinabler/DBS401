@@ -11,8 +11,13 @@ const getUserFromDB = async () => {
         // Get a connection from the pool
         connection = await pool.getConnection();
 
-        // Execute a query to fetch user data
-        const result = await connection.execute('SELECT * FROM user_profiles');
+        // Execute a query to fetch user data with joined random_id from users table
+        const result = await connection.execute(`
+            SELECT up.*, u.random_id 
+            FROM user_profiles up
+            JOIN users u ON up.user_id = u.user_id
+            ORDER BY up.user_id ASC
+        `);
 
         // Return the result set
         return result;
@@ -39,13 +44,28 @@ const getUserByIdInDB = async (id) => {
         // Get a connection from the pool
         connection = await pool.getConnection();
 
-        // Execute a query to fetch user data
-        const result = await connection.execute('SELECT * FROM user_profiles WHERE profile_id = :id', [id]);
+        // Execute a query to fetch user data - now supporting both profile_id and random_id lookups
+        let result;
+
+        // Determine if the id is numeric (profile_id) or string (random_id)
+        if (!isNaN(id)) {
+            // If numeric, query by profile_id
+            result = await connection.execute(
+                'SELECT up.*, u.random_id FROM user_profiles up JOIN users u ON up.user_id = u.user_id WHERE up.profile_id = :id',
+                [id]
+            );
+        } else {
+            // If string, assume it's a random_id
+            result = await connection.execute(
+                'SELECT up.*, u.random_id FROM user_profiles up JOIN users u ON up.user_id = u.user_id WHERE up.random_id = :id OR u.random_id = :id',
+                [id]
+            );
+        }
 
         // Return the result set
         return result.rows;
     } catch (err) {
-        console.error('Error fetching users:', err);
+        console.error('Error fetching user by ID:', err);
     } finally {
         if (connection) {
             try {
@@ -59,14 +79,7 @@ const getUserByIdInDB = async (id) => {
 }
 
 const updateUserInDB = async (data) => {
-    const profile_id = data.userId;
-    const full_name = data.name;
-    const address = data.address;
-    const phone_number = data.phone;
-    const hobbies = data.hobbies;
-    // const avatar_url = data.avatar_url;
-    const birthday = data.birthday;
-    const gender = data.gender;
+    const { profile_id, random_id, full_name, address, phone_number, hobbies, birthday, gender } = data;
     let connection;
     try {
         // Create a connection pool
@@ -75,25 +88,78 @@ const updateUserInDB = async (data) => {
         // Get a connection from the pool
         connection = await pool.getConnection();
 
-        // Execute a query to fetch user data
-        const result = await connection.execute(
-            `UPDATE user_profiles 
-            SET full_name = :full_name, address = :address, phone_number = :phone_number, hobbies = :hobbies, birthday = :birthday
-            WHERE profile_id = :profile_id`,
-            {
-                full_name,
-                address,
-                phone_number,
-                hobbies,
-                birthday,
-                profile_id
-            },
-            { autoCommit: true }
-        );
-        // Return the result set
+        // Log the data being sent to the database for debugging
+        console.log('Updating user with data:', {
+            profile_id,
+            random_id,
+            full_name,
+            address,
+            phone_number,
+            hobbies,
+            birthday,
+            gender
+        });
+
+        let result;
+
+        // Support updating by either profile_id or random_id
+        if (profile_id) {
+            result = await connection.execute(
+                `UPDATE user_profiles 
+                SET full_name = :full_name, 
+                    address = :address, 
+                    phone_number = :phone_number, 
+                    hobbies = :hobbies, 
+                    birthday = :birthday, 
+                    gender = :gender
+                WHERE profile_id = :profile_id`,
+                {
+                    full_name,
+                    address,
+                    phone_number,
+                    hobbies,
+                    birthday,
+                    gender,
+                    profile_id
+                },
+                { autoCommit: true }
+            );
+        } else if (random_id) {
+            result = await connection.execute(
+                `UPDATE user_profiles 
+                SET full_name = :full_name, 
+                    address = :address, 
+                    phone_number = :phone_number, 
+                    hobbies = :hobbies, 
+                    birthday = :birthday, 
+                    gender = :gender
+                WHERE random_id = :random_id`,
+                {
+                    full_name,
+                    address,
+                    phone_number,
+                    hobbies,
+                    birthday,
+                    gender,
+                    random_id
+                },
+                { autoCommit: true }
+            );
+        } else {
+            throw new Error('Either profile_id or random_id is required for update');
+        }
+
+        console.log('Update result:', result);
+
+        // Return the result
         return result;
     } catch (err) {
-        console.error('Error fetching users:', err);
+        console.error('Error updating user:', err);
+        console.error('Error details:', err.message);
+        if (err.offset) {
+            console.error(`Error at position: ${err.offset}`);
+        }
+        throw err; // Re-throw to handle it in the controller
     } finally {
         if (connection) {
             try {
