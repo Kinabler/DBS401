@@ -37,6 +37,18 @@ app.use(morgan('combined', { stream: accessLogStream }));
 // Init routes
 app.use('/', webRoute);
 
+// Handler Middleware 
+// 404 Not Found: Must be placed after all routes
+app.use((req, res) => {
+    return res.status(404).render("404Page");
+});
+
+// 500 Internal Server Error handler must be placed after all routes but with the 4 parameters
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    return res.status(500).render("500Page");
+});
+
 // Listening to the server
 app.listen(port, host, () => {
     console.log(`Server is running at http://${host}:${port}`);

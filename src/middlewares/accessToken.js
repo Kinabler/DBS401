@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const { getIdOfAdminFromDB } = require('../services/CRUD_service');
+const { handle403 } = require('./errorHandlers');
 
 // Secret key for JWT - in production, store this in environment variables
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -39,8 +40,8 @@ const verifyToken = async (req, res, next) => {
                 const isAdmin = decoded.userId === adminId;
 
                 if (!isAdmin) {
-                    console.log("Access denied: User is not authorized to access user list");
-                    return res.status(403).send('Access denied: You do not have permission to view the user list');
+                    // Use the 403 handler with a custom message
+                    return handle403(req, res, "Access denied: Only administrators can view the user list");
                 }
             } catch (adminErr) {
                 console.error("Error fetching admin ID:", adminErr);
