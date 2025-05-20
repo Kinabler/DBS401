@@ -11,9 +11,19 @@ const getUserFromDB = async () => {
         // Get a connection from the pool
         connection = await pool.getConnection();
 
-        // Execute a query to fetch user data with joined random_id from users table
+        // Select specific columns in the same order they were before
+        // This ensures the indices in the template remain valid
         const result = await connection.execute(`
-            SELECT up.*, u.random_id 
+            SELECT 
+                up.profile_id,
+                up.user_id, 
+                up.full_name, 
+                up.address, 
+                up.phone_number, 
+                up.hobbies, 
+                up.birthday,
+                u.created_at,
+                NVL(up.gender, 'Unknown') as gender
             FROM user_profiles up
             JOIN users u ON up.user_id = u.user_id
             ORDER BY up.user_id ASC
@@ -172,9 +182,40 @@ const updateUserInDB = async (data) => {
     }
 }
 
+const getIdOfAdminFromDB = async () => {
+    let connection;
+    try {
+        // Create a connection pool
+        const pool = await createPool();
+
+        // Get a connection from the pool
+        connection = await pool.getConnection();
+
+        // Execute a query to fetch the admin user ID
+        const result = await connection.execute(
+            'SELECT user_id FROM users WHERE role = :role',
+            { role: 'admin' }
+        );
+
+        // Return the admin user ID
+        return result.rows[0][0];
+    } catch (err) {
+        console.error('Error fetching admin user ID:', err);
+    } finally {
+        if (connection) {
+            try {
+                // Release the connection back to the pool
+                await connection.close();
+            } catch (err) {
+                console.error('Error closing connection:', err);
+            }
+        }
+    }
+}
+
 module.exports = {
     getUserFromDB,
     getUserByIdInDB,
     updateUserInDB,
-
+    getIdOfAdminFromDB,
 };

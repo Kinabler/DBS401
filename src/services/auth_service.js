@@ -35,7 +35,10 @@ const authenticateUser = async (username, password) => {
             id: result.rows[0][0],
             username: result.rows[0][1],
             password: result.rows[0][2],
-            role: result.rows[0][6] || 'user'
+            email: result.rows[0][3],
+            role: result.rows[0][4] || 'user',
+            createAt: result.rows[0][5],
+            updateAt: result.rows[0][6]
         };
 
         // Verify the username matches (additional security check)
@@ -78,46 +81,15 @@ const generateToken = (user) => {
     const payload = {
         userId: user.id,
         username: user.username,
-        role: user.role
+        email: user.email,
+        createAt: user.createAt,
+        updateAt: user.updateAt
     };
 
     return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 };
 
-// Verify JWT token middleware
-const verifyToken = (req, res, next) => {
-    let token;
-
-    // Check for token in cookies first (safely)
-    if (req.cookies && req.cookies.auth_token) {
-        token = req.cookies.auth_token;
-    }
-
-    // Check for token in Authorization header as fallback
-    const bearerHeader = req.headers['authorization'];
-    if (!token && typeof bearerHeader !== 'undefined') {
-        const bearer = bearerHeader.split(' ');
-        token = bearer[1];
-    }
-
-    if (!token) {
-        console.log("No token found in cookies or authorization header");
-        return res.redirect('/login');
-    }
-
-    jwt.verify(token, JWT_SECRET, (err, decoded) => {
-        if (err) {
-            console.log("Token verification failed:", err.message);
-            return res.redirect('/login');
-        } else {
-            req.user = decoded;
-            next();
-        }
-    });
-};
-
 module.exports = {
     authenticateUser,
-    generateToken,
-    verifyToken
+    generateToken
 };
