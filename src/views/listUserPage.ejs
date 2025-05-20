@@ -105,77 +105,80 @@
             </div>
 
             <div class="table-container">
-                <table id="users_table">
-                    <thead>
-                        <tr>
-                            <th><i class="fas fa-id-card"></i> ID</th>
-                            <th><i class="fas fa-user"></i> Name</th>
-                            <th><i class="fas fa-map-marker-alt"></i> Address</th>
-                            <th><i class="fas fa-phone"></i> Phone Number</th>
-                            <th><i class="fas fa-heart"></i> Hobbies</th>
-                            <th><i class="fas fa-calendar-alt"></i> Birthdate</th>
-                            <th><i class="fas fa-venus-mars"></i> Gender</th>
-                            <th><i class="fas fa-cogs"></i> Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% if(listUser && listUser.rows) { %>
-                            <% listUser.rows.forEach(user=> { %>
-                                <tr>
-                                    <td><span class="id-badge">
-                                            <%= user[1] %>
-                                        </span></td>
-                                    <td>
-                                        <%= user[2] %>
-                                    </td>
-                                    <td>
-                                        <%= user[3] %>
-                                    </td>
-                                    <td>
-                                        <span class="phone-number">
-                                            <i class="fas fa-phone-alt"></i>
-                                            <span class="phone-value masked">
-                                                <span class="masked-value">•••••••••••</span>
-                                                <span class="actual-value" style="display: none;">
-                                                    <%= user[4] %>
+                <div class="scrollable-table-container">
+                    <div class="scroll-indicator">
+                        <i class="fas fa-arrows-left-right"></i>
+                    </div>
+                    <table id="users_table">
+                        <thead>
+                            <tr>
+                                <!-- Remove ID column header -->
+                                <th class="name-column"><i class="fas fa-user"></i> Name</th>
+                                <th class="address-column"><i class="fas fa-map-marker-alt"></i> Address</th>
+                                <th class="phone-column"><i class="fas fa-phone"></i> Phone Number</th>
+                                <th class="hobbies-column"><i class="fas fa-heart"></i> Hobbies</th>
+                                <th class="birthdate-column"><i class="fas fa-calendar-alt"></i> Birthdate</th>
+                                <th class="gender-column"><i class="fas fa-venus-mars"></i> Gender</th>
+                                <th class="actions-column"><i class="fas fa-cogs"></i> Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if(listUser && listUser.rows) { %>
+                                <% listUser.rows.forEach(user=> { %>
+                                    <tr data-user-id="<%= user[0] %>">
+                                        <!-- Remove ID column data cell -->
+                                        <td class="name-column">
+                                            <%= user[2] %>
+                                        </td>
+                                        <td class="address-column">
+                                            <%= user[3] %>
+                                        </td>
+                                        <td class="phone-column">
+                                            <span class="phone-number">
+                                                <i class="fas fa-phone-alt"></i>
+                                                <span class="phone-value masked">
+                                                    <span class="masked-value">•••••••••••</span>
+                                                    <span class="actual-value" style="display: none;">
+                                                        <%= user[4] %>
+                                                    </span>
                                                 </span>
+                                                <button class="toggle-visibility" title="Show/Hide Phone Number">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
                                             </span>
-                                            <button class="toggle-visibility" title="Show/Hide Phone Number">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <%= user[5] %>
-                                    </td>
-                                    <td>
-                                        <%= new Date(user[7]).toLocaleDateString() %>
-                                    </td>
-                                    <td>
-                                        <span class="gender-badge <%= user[8].toLowerCase() %>">
-                                            <i
-                                                class="fas fa-<%= user[8].toLowerCase() === 'female' ? 'venus' : 'mars' %>"></i>
-                                            <%= user[8] %>
-                                        </span>
-                                    </td>
-                                    <td class="actions-cell">
-                                        <button class="action-btn edit-btn" title="Edit User"><i
-                                                class="fas fa-edit"></i></button>
-                                        <button class="action-btn delete-btn" title="Delete User"><i
-                                                class="fas fa-trash-alt"></i></button>
-                                    </td>
-                                </tr>
-                                <% }) %>
-                                    <% } else { %>
-                                        <tr>
-                                            <td colspan="8" class="no-data">
-                                                <i class="fas fa-database"></i>
-                                                <p>No user data found in the secure database</p>
-                                            </td>
-                                        </tr>
-                                        <% } %>
-                    </tbody>
-                </table>
+                                        </td>
+                                        <td class="hobbies-column">
+                                            <%= user[5] %>
+                                        </td>
+                                        <td class="birthdate-column">
+                                            <%= new Date(user[7]).toLocaleDateString() %>
+                                        </td>
+                                        <td class="gender-column">
+                                            <span class="gender-badge <%= user[8].toLowerCase() %>">
+                                                <i
+                                                    class="fas fa-<%= user[8].toLowerCase() === 'female' ? 'venus' : 'mars' %>"></i>
+                                                <%= user[8] %>
+                                            </span>
+                                        </td>
+                                        <td class="actions-column">
+                                            <button class="action-btn edit-btn" title="Edit User"><i
+                                                    class="fas fa-edit"></i></button>
+                                            <button class="action-btn delete-btn" title="Delete User"><i
+                                                    class="fas fa-trash-alt"></i></button>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                                        <% } else { %>
+                                            <tr>
+                                                <td colspan="8" class="no-data">
+                                                    <i class="fas fa-database"></i>
+                                                    <p>No user data found in the secure database</p>
+                                                </td>
+                                            </tr>
+                                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div class="pagination">
@@ -331,8 +334,8 @@
                 const genderValue = genderFilter.value;
 
                 tableRows.forEach(row => {
-                    const name = row.cells[1].textContent.toLowerCase();
-                    const gender = row.cells[6].textContent.trim();
+                    const name = row.cells[0].textContent.toLowerCase(); // Column index shifted (was 1)
+                    const gender = row.cells[5].textContent.trim(); // Column index shifted (was 6)
 
                     const matchesSearch = name.includes(searchTerm);
                     const matchesGender = genderValue === '' || gender.includes(genderValue);
@@ -386,16 +389,16 @@
                     // Get the closest table row
                     const row = this.closest('tr');
 
-                    // Extract user data from the row
-                    const userId = row.querySelector('.id-badge').textContent.trim();
-                    const name = row.cells[1].textContent.trim();
-                    const address = row.cells[2].textContent.trim();
+                    // Extract user data from the row - now using data attribute for ID
+                    const userId = row.dataset.userId;
+                    const name = row.cells[0].textContent.trim();
+                    const address = row.cells[1].textContent.trim();
                     const phone = row.querySelector('.actual-value').textContent.trim();
-                    const hobbies = row.cells[4].textContent.trim();
-                    const birthdate = row.cells[5].textContent.trim();
+                    const hobbies = row.cells[3].textContent.trim();
+                    const birthdate = row.cells[4].textContent.trim();
 
                     // Get clean gender value (removing any extra spaces or icons)
-                    let genderText = row.cells[6].textContent.trim();
+                    let genderText = row.cells[5].textContent.trim();
                     // Extract just "Male" or "Female" from the text
                     let gender = genderText.includes('Male') ? 'Male' : 'Female';
 
@@ -419,12 +422,9 @@
                         console.error("Error formatting date:", e);
                     }
 
-                    // Explicitly set gender select value
-                    document.getElementById('gender').value = gender;
-                    console.log('Setting gender select to:', gender);
-
                     // Set form action
                     document.getElementById('editUserForm').setAttribute('action', `/user/edit/${userId}`);
+                    document.getElementById('gender').value = gender;
 
                     // Show the modal
                     document.getElementById('editUserModal').style.display = 'block';
@@ -448,12 +448,35 @@
                     modal.style.display = 'none';
                 }
             });
+
+            // Horizontal scroll indicator for table
+            const tableContainer = document.querySelector('.scrollable-table-container');
+            const scrollIndicator = document.querySelector('.scroll-indicator');
+
+            function checkScrollability() {
+                if (tableContainer.scrollWidth > tableContainer.clientWidth) {
+                    // Table is scrollable
+                    scrollIndicator.classList.add('visible');
+                } else {
+                    // Table is not scrollable
+                    scrollIndicator.classList.remove('visible');
+                }
+            }
+
+            window.addEventListener('resize', checkScrollability);
+            checkScrollability(); // Check on load
+
+            // Hide indicator after user has scrolled
+            tableContainer.addEventListener('scroll', function () {
+                scrollIndicator.classList.remove('visible');
+            }, { once: true });
+
+            // Extra safety - hide after a timeout
+            setTimeout(function () {
+                scrollIndicator.classList.remove('visible');
+            }, 1000);
         });
     </script>
-
-
-
-</html>
 </body>
 
 </html>

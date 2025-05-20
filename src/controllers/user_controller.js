@@ -20,8 +20,7 @@ const postEditUserById = async (req, res) => {
         const { id } = req.params;
         const { name, address, phone, hobbies, birthdate, gender, userId } = req.body;
 
-        console.log('Form data received:', req.body);
-        console.log('User ID from params:', id, 'User ID from form:', userId);
+        // console.log('Form data received:', req.body);
 
         // Create the data object for updating
         const userData = {
@@ -35,7 +34,7 @@ const postEditUserById = async (req, res) => {
         };
 
         // Log the prepared data
-        console.log('Data being sent to update service:', userData);
+        // console.log('Data being sent to update service:', userData);
 
         // Call the update service
         const result = await updateUserInDB(userData);

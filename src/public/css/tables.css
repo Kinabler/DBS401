@@ -112,20 +112,48 @@
     overflow: hidden;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     margin-bottom: 2rem;
+    position: relative;
+    /* Add positioning context for scroll indicator */
 }
 
-/* Table styles - improved alignment */
+/* Enhance scrollable container */
+.scrollable-table-container {
+    overflow-x: auto;
+    position: relative;
+    padding-bottom: 5px;
+    /* Add some space at the bottom */
+}
+
+/* Make scroll indicator more visible */
+.scroll-indicator {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: rgba(100, 255, 218, 0.2);
+    padding: 5px 10px;
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 10;
+}
+
+.scroll-indicator.visible {
+    opacity: 1;
+}
+
+/* Table styles - improved alignment and spacing */
 #users_table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
     background-color: transparent;
-    table-layout: fixed;
-    /* Add fixed layout for consistent column widths */
+    table-layout: auto;
+    /* Change to auto to better handle content */
 }
 
 #users_table th {
-    padding: 1rem;
+    padding: 1.2rem 1rem;
+    /* Increase padding */
     background-color: var(--secondary);
     color: var(--accent);
     font-weight: bold;
@@ -147,7 +175,8 @@
 }
 
 #users_table td {
-    padding: 0.75rem 1rem;
+    padding: 1rem;
+    /* Increase padding */
     border-bottom: 1px solid rgba(100, 255, 218, 0.05);
     vertical-align: middle;
     text-align: left;
@@ -158,51 +187,84 @@
     /* Allow breaking words in content */
 }
 
-/* Set specific column widths for better alignment */
-#users_table th:nth-child(1),
-#users_table td:nth-child(1) {
-    width: 8%;
+/* Adjust column widths for better content display - removed ID column */
+#users_table .name-column {
+    width: 180px;
+    min-width: 180px;
 }
 
+#users_table .address-column {
+    width: 220px;
+    min-width: 220px;
+}
+
+#users_table .phone-column {
+    width: 150px;
+    min-width: 150px;
+}
+
+#users_table .hobbies-column {
+    width: 180px;
+    min-width: 180px;
+}
+
+#users_table .birthdate-column {
+    width: 120px;
+    min-width: 120px;
+}
+
+#users_table .gender-column {
+    width: 100px;
+    min-width: 100px;
+}
+
+#users_table .actions-column {
+    width: 100px;
+    min-width: 100px;
+}
+
+/* Remove ID-specific column width rules since the column is gone */
 /* ID */
-#users_table th:nth-child(2),
-#users_table td:nth-child(2) {
+#users_table th:nth-child(1),
+#users_table td:nth-child(1) {
     width: 15%;
+    /* Name column is now first */
 }
 
 /* Name */
-#users_table th:nth-child(3),
-#users_table td:nth-child(3) {
+#users_table th:nth-child(2),
+#users_table td:nth-child(2) {
     width: 20%;
+    /* Address column is now second */
 }
 
 /* Address */
+#users_table th:nth-child(3),
+#users_table td:nth-child(3) {
+    width: 15%;
+}
+
+/* Phone */
 #users_table th:nth-child(4),
 #users_table td:nth-child(4) {
     width: 15%;
 }
 
-/* Phone */
+/* Hobbies */
 #users_table th:nth-child(5),
 #users_table td:nth-child(5) {
-    width: 15%;
-}
-
-/* Hobbies */
-#users_table th:nth-child(6),
-#users_table td:nth-child(6) {
     width: 10%;
 }
 
 /* Birthdate */
-#users_table th:nth-child(7),
-#users_table td:nth-child(7) {
+#users_table th:nth-child(6),
+#users_table td:nth-child(6) {
     width: 8%;
 }
 
 /* Gender */
-#users_table th:nth-child(8),
-#users_table td:nth-child(8) {
+#users_table th:nth-child(7),
+#users_table td:nth-child(7) {
     width: 9%;
 }
 
@@ -292,11 +354,11 @@
 }
 
 .toggle-visibility {
-    background: none;
+    background-color: rgba(100, 255, 218, 0.1);
     border: none;
     color: var(--text-secondary);
     cursor: pointer;
-    padding: 0.2rem;
+    padding: 0.3rem;
     border-radius: 4px;
     transition: all 0.3s ease;
 }
