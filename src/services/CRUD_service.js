@@ -54,20 +54,22 @@ const getUserByIdInDB = async (id) => {
         // Get a connection from the pool
         connection = await pool.getConnection();
 
-        // Execute a query to fetch user data - now only supporting profile_id lookups
+        // Execute a query to fetch user data - now supporting both profile_id and random_id lookups
         let result;
 
-        // Since random_id column was removed, we only query by profile_id
+        // Determine if the id is numeric (profile_id) or string (random_id)
         if (!isNaN(id)) {
             // If numeric, query by profile_id
             result = await connection.execute(
-                'SELECT up.* FROM user_profiles up JOIN users u ON up.user_id = u.user_id WHERE up.profile_id = :id',
+                'SELECT up.*, u.random_id FROM user_profiles up JOIN users u ON up.user_id = u.user_id WHERE up.profile_id = :id',
                 [id]
             );
         } else {
-            // If non-numeric, log warning and return empty result
-            console.warn('Non-numeric ID provided but random_id no longer exists in the database');
-            return [];
+            // If string, assume it's a random_id
+            result = await connection.execute(
+                'SELECT up.*, u.random_id FROM user_profiles up JOIN users u ON up.user_id = u.user_id WHERE up.random_id = :id OR u.random_id = :id',
+                [id]
+            );
         }
 
         // Return the result set
@@ -87,7 +89,6 @@ const getUserByIdInDB = async (id) => {
 }
 
 const updateUserInDB = async (data) => {
-    // Fix: Destructure to include random_id if present
     const { profile_id, full_name, address, phone_number, hobbies, birthday, gender } = data;
     let connection;
     try {
@@ -98,46 +99,66 @@ const updateUserInDB = async (data) => {
         connection = await pool.getConnection();
 
         // Log the data being sent to the database for debugging
-        // console.log('Updating user with data:', {
-        //     profile_id,
-        //     full_name,
-        //     address,
-        //     phone_number,
-        //     hobbies,
-        //     birthday,
-        //     gender
-        // });
+        console.log('Updating user with data:', {
+            profile_id,
+            full_name,
+            address,
+            phone_number,
+            hobbies,
+            birthday,
+            gender
+        });
 
         let result;
 
-        // Since we only use profile_id in the current implementation, simplify the logic
-        // and remove the non-working random_id condition
-        if (!profile_id) {
-            throw new Error('Profile ID is required for update');
+        // Support updating by either profile_id or random_id
+        if (profile_id) {
+            result = await connection.execute(
+                `UPDATE user_profiles 
+                SET full_name = :full_name, 
+                    address = :address, 
+                    phone_number = :phone_number, 
+                    hobbies = :hobbies, 
+                    birthday = :birthday, 
+                    gender = :gender
+                WHERE profile_id = :profile_id`,
+                {
+                    full_name,
+                    address,
+                    phone_number,
+                    hobbies,
+                    birthday,
+                    gender,
+                    profile_id
+                },
+                { autoCommit: true }
+            );
+        } else if (random_id) {
+            result = await connection.execute(
+                `UPDATE user_profiles 
+                SET full_name = :full_name, 
+                    address = :address, 
+                    phone_number = :phone_number, 
+                    hobbies = :hobbies, 
+                    birthday = :birthday, 
+                    gender = :gender
+                WHERE random_id = :random_id`,
+                {
+                    full_name,
+                    address,
+                    phone_number,
+                    hobbies,
+                    birthday,
+                    gender,
+                    random_id
+                },
+                { autoCommit: true }
+            );
+        } else {
+            throw new Error('Either profile_id or random_id is required for update');
         }
 
-        result = await connection.execute(
-            `UPDATE user_profiles 
-            SET full_name = :full_name, 
-                address = :address, 
-                phone_number = :phone_number, 
-                hobbies = :hobbies, 
-                birthday = :birthday, 
-                gender = :gender
-            WHERE profile_id = :profile_id`,
-            {
-                full_name,
-                address,
-                phone_number,
-                hobbies,
-                birthday,
-                gender,
-                profile_id
-            },
-            { autoCommit: true }
-        );
-
-        // console.log('Update result:', result);
+        console.log('Update result:', result);
 
         // Return the result
         return result;
@@ -171,7 +192,7 @@ const getIdOfAdminFromDB = async () => {
 
         // Execute a query to fetch the admin user ID
         const result = await connection.execute(
-            'SELECT user_id FROM users WHERE role = :role',
+            'SELECT TO_CHAR(user_id) as user_id FROM users WHERE role = :role',
             { role: 'admin' }
         );
 
@@ -191,9 +212,41 @@ const getIdOfAdminFromDB = async () => {
     }
 }
 
+const getUserRoleFromDB = async (userId) => {
+    let connection;
+    try {
+        // Create a connection pool
+        const pool = await createPool();
+
+        // Get a connection from the pool
+        connection = await pool.getConnection();
+
+        // Execute a query to fetch the user role
+        const result = await connection.execute(
+            'SELECT role FROM users WHERE user_id = :userId',
+            { userId }
+        );
+
+        // Return the user role
+        return result.rows[0][0];
+    } catch (err) {
+        console.error('Error fetching user role:', err);
+    } finally {
+        if (connection) {
+            try {
+                // Release the connection back to the pool
+                await connection.close();
+            } catch (err) {
+                console.error('Error closing connection:', err);
+            }
+        }
+    }
+}
+
 module.exports = {
     getUserFromDB,
     getUserByIdInDB,
     updateUserInDB,
     getIdOfAdminFromDB,
+    getUserRoleFromDB,
 };

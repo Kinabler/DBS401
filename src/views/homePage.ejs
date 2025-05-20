@@ -22,170 +22,142 @@
 
 <body class="sansation-regular">
     <!-- Navigation -->
-    <nav class="navbar">
-        <div class="logo sansation-bold">DBS<span>401</span></div>
-        <ul class="nav-links sansation-regular">
-            <li><a href="/">Home</a></li>
-            <li><a href="/about">About</a></li>
-            <li class="dropdown">
-                <a href="#" class="dropdown-toggle">Users <i class="fas fa-chevron-down"></i></a>
-                <div class="dropdown-menu">
-                    <a href="/user/list" class="dropdown-item">Users Table</a>
-                    <a href="/user/create" class="dropdown-item">Add User</a>
-                </div>
-            </li>
-            <li class="dropdown">
-                <a href="#" class="dropdown-toggle">Resources <i class="fas fa-chevron-down"></i></a>
-                <div class="dropdown-menu">
-                    <a href="https://nodejs.org/docs/latest/api/documentation.html"
-                        class="dropdown-item">Documentation</a>
-                    <a href="https://www.w3schools.com/nodejs/" class="dropdown-item">Tutorials</a>
-                    <a href="https://nodejs.org/en/download" class="dropdown-item">Downloads</a>
-                </div>
-            </li>
-            <li class="dropdown">
-                <a href="#" class="dropdown-toggle">Profile <i class="fas fa-chevron-down"></i></a>
-                <div class="dropdown-menu">
-                    <a href="/user/profile" class="dropdown-item">My Account</a>
-                    <a href="/logout" class="dropdown-item">Logout</a>
-                </div>
-            </li>
-        </ul>
-    </nav>
+    <%- include('./partials/navbar') %>
 
-    <!-- Header Section -->
-    <header class="header">
-        <h1 class="sansation-bold">Database Security <span style="color: var(--accent);">401</span></h1>
-        <h2 class="sansation-light">Advanced Information Security for Modern Enterprises</h2>
-        <p>
-            Master the art of protecting critical data assets through comprehensive security strategies,
-            advanced threat detection, and robust defensive mechanisms.
-        </p>
-        <a href="#learn-more" class="cta-button">Learn More</a>
-    </header>
-
-    <!-- Key Features Section -->
-    <section id="learn-more" class="section">
-        <h2 class="section-title sansation-bold">What You'll Learn</h2>
-        <div class="cards-container">
-            <div class="card">
-                <div class="card-icon"><i class="fas fa-shield-alt"></i></div>
-                <h3 class="card-title sansation-bold">Advanced Security Protocols</h3>
-                <p class="card-content">
-                    Learn industry-leading database security protocols and implementation strategies
-                    to protect sensitive information from unauthorized access.
-                </p>
-            </div>
-            <div class="card">
-                <div class="card-icon"><i class="fas fa-bug"></i></div>
-                <h3 class="card-title sansation-bold">Threat Detection</h3>
-                <p class="card-content">
-                    Master techniques for identifying, analyzing, and mitigating database vulnerabilities
-                    before they can be exploited by malicious actors.
-                </p>
-            </div>
-            <div class="card">
-                <div class="card-icon"><i class="fas fa-lock"></i></div>
-                <h3 class="card-title sansation-bold">Data Encryption</h3>
-                <p class="card-content">
-                    Implement robust encryption methods to secure data at rest and in transit,
-                    ensuring confidentiality even in compromised environments.
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Course Overview Section -->
-    <section class="section" style="background-color: var(--secondary);">
-        <h2 class="section-title sansation-bold">Course Overview</h2>
-        <div class="cards-container">
-            <div class="card">
-                <div class="card-icon"><i class="fas fa-calendar-alt"></i></div>
-                <h3 class="card-title sansation-bold">12-Week Program</h3>
-                <p class="card-content">
-                    Comprehensive curriculum covering all aspects of database security
-                    through hands-on labs and real-world scenarios.
-                </p>
-            </div>
-            <div class="card">
-                <div class="card-icon"><i class="fas fa-laptop-code"></i></div>
-                <h3 class="card-title sansation-bold">Practical Labs</h3>
-                <p class="card-content">
-                    Apply security concepts in our state-of-the-art virtual lab environments,
-                    simulating real enterprise database infrastructures.
-                </p>
-            </div>
-            <div class="card">
-                <div class="card-icon"><i class="fas fa-certificate"></i></div>
-                <h3 class="card-title sansation-bold">Industry Certification</h3>
-                <p class="card-content">
-                    Prepare for industry-recognized certifications with curriculum aligned to
-                    the latest security standards and best practices.
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Call to Action -->
-    <section class="section">
-        <div style="text-align: center;">
-            <h2 class="sansation-bold" style="color: var(--accent); margin-bottom: 1rem;">Ready to Secure Your Future?
-            </h2>
-            <p style="max-width: 600px; margin: 0 auto 2rem;">
-                Join our next cohort and become a certified database security professional.
-                Limited seats available for hands-on training with industry experts.
+        <!-- Header Section -->
+        <header class="header">
+            <h1 class="sansation-bold">Database Security <span style="color: var(--accent);">401</span></h1>
+            <h2 class="sansation-light">Advanced Information Security for Modern Enterprises</h2>
+            <p>
+                Master the art of protecting critical data assets through comprehensive security strategies,
+                advanced threat detection, and robust defensive mechanisms.
             </p>
-            <a href="#" class="cta-button">Enroll Now</a>
-        </div>
-    </section>
+            <a href="#learn-more" class="cta-button">Learn More</a>
+        </header>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="logo sansation-bold" style="margin-bottom: 1rem;">DBS<span>401</span></div>
-        <ul class="footer-links">
-            <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-            <li><a href="#"><i class="fab fa-linkedin"></i></a></li>
-            <li><a href="#"><i class="fab fa-github"></i></a></li>
-            <li><a href="#"><i class="fab fa-discord"></i></a></li>
-        </ul>
-        <p>© 2023 Database Security 401. All rights reserved.</p>
-    </footer>
+        <!-- Key Features Section -->
+        <section id="learn-more" class="section">
+            <h2 class="section-title sansation-bold">What You'll Learn</h2>
+            <div class="cards-container">
+                <div class="card">
+                    <div class="card-icon"><i class="fas fa-shield-alt"></i></div>
+                    <h3 class="card-title sansation-bold">Advanced Security Protocols</h3>
+                    <p class="card-content">
+                        Learn industry-leading database security protocols and implementation strategies
+                        to protect sensitive information from unauthorized access.
+                    </p>
+                </div>
+                <div class="card">
+                    <div class="card-icon"><i class="fas fa-bug"></i></div>
+                    <h3 class="card-title sansation-bold">Threat Detection</h3>
+                    <p class="card-content">
+                        Master techniques for identifying, analyzing, and mitigating database vulnerabilities
+                        before they can be exploited by malicious actors.
+                    </p>
+                </div>
+                <div class="card">
+                    <div class="card-icon"><i class="fas fa-lock"></i></div>
+                    <h3 class="card-title sansation-bold">Data Encryption</h3>
+                    <p class="card-content">
+                        Implement robust encryption methods to secure data at rest and in transit,
+                        ensuring confidentiality even in compromised environments.
+                    </p>
+                </div>
+            </div>
+        </section>
 
-    <!-- Dropdown Menu Script -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const dropdowns = document.querySelectorAll('.dropdown');
+        <!-- Course Overview Section -->
+        <section class="section" style="background-color: var(--secondary);">
+            <h2 class="section-title sansation-bold">Course Overview</h2>
+            <div class="cards-container">
+                <div class="card">
+                    <div class="card-icon"><i class="fas fa-calendar-alt"></i></div>
+                    <h3 class="card-title sansation-bold">12-Week Program</h3>
+                    <p class="card-content">
+                        Comprehensive curriculum covering all aspects of database security
+                        through hands-on labs and real-world scenarios.
+                    </p>
+                </div>
+                <div class="card">
+                    <div class="card-icon"><i class="fas fa-laptop-code"></i></div>
+                    <h3 class="card-title sansation-bold">Practical Labs</h3>
+                    <p class="card-content">
+                        Apply security concepts in our state-of-the-art virtual lab environments,
+                        simulating real enterprise database infrastructures.
+                    </p>
+                </div>
+                <div class="card">
+                    <div class="card-icon"><i class="fas fa-certificate"></i></div>
+                    <h3 class="card-title sansation-bold">Industry Certification</h3>
+                    <p class="card-content">
+                        Prepare for industry-recognized certifications with curriculum aligned to
+                        the latest security standards and best practices.
+                    </p>
+                </div>
+            </div>
+        </section>
 
-            // Toggle dropdown on click
-            dropdowns.forEach(dropdown => {
-                const toggleBtn = dropdown.querySelector('.dropdown-toggle');
+        <!-- Call to Action -->
+        <section class="section">
+            <div style="text-align: center;">
+                <h2 class="sansation-bold" style="color: var(--accent); margin-bottom: 1rem;">Ready to Secure Your
+                    Future?
+                </h2>
+                <p style="max-width: 600px; margin: 0 auto 2rem;">
+                    Join our next cohort and become a certified database security professional.
+                    Limited seats available for hands-on training with industry experts.
+                </p>
+                <a href="#" class="cta-button">Enroll Now</a>
+            </div>
+        </section>
 
-                toggleBtn.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    dropdown.classList.toggle('active');
-                    dropdown.querySelector('.dropdown-menu').classList.toggle('show');
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="logo sansation-bold" style="margin-bottom: 1rem;">DBS<span>401</span></div>
+            <ul class="footer-links">
+                <li><a href="#"><i class="fab fa-twitter"></i></a></li>
+                <li><a href="#"><i class="fab fa-linkedin"></i></a></li>
+                <li><a href="#"><i class="fab fa-github"></i></a></li>
+                <li><a href="#"><i class="fab fa-discord"></i></a></li>
+            </ul>
+            <p>© 2023 Database Security 401. All rights reserved.</p>
+        </footer>
 
-                    // Close other dropdowns
-                    dropdowns.forEach(otherDropdown => {
-                        if (otherDropdown !== dropdown && otherDropdown.classList.contains('active')) {
-                            otherDropdown.classList.remove('active');
-                            otherDropdown.querySelector('.dropdown-menu').classList.remove('show');
-                        }
+        <!-- Dropdown Menu Script -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const dropdowns = document.querySelectorAll('.dropdown');
+
+                // Toggle dropdown on click
+                dropdowns.forEach(dropdown => {
+                    const toggleBtn = dropdown.querySelector('.dropdown-toggle');
+
+                    toggleBtn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        dropdown.classList.toggle('active');
+                        dropdown.querySelector('.dropdown-menu').classList.toggle('show');
+
+                        // Close other dropdowns
+                        dropdowns.forEach(otherDropdown => {
+                            if (otherDropdown !== dropdown && otherDropdown.classList.contains('active')) {
+                                otherDropdown.classList.remove('active');
+                                otherDropdown.querySelector('.dropdown-menu').classList.remove('show');
+                            }
+                        });
                     });
                 });
-            });
 
-            // Close dropdowns when clicking outside
-            document.addEventListener('click', function (e) {
-                if (!e.target.closest('.dropdown')) {
-                    dropdowns.forEach(dropdown => {
-                        dropdown.classList.remove('active');
-                        dropdown.querySelector('.dropdown-menu').classList.remove('show');
-                    });
-                }
+                // Close dropdowns when clicking outside
+                document.addEventListener('click', function (e) {
+                    if (!e.target.closest('.dropdown')) {
+                        dropdowns.forEach(dropdown => {
+                            dropdown.classList.remove('active');
+                            dropdown.querySelector('.dropdown-menu').classList.remove('show');
+                        });
+                    }
+                });
             });
-        });
-    </script>
+        </script>
 </body>
 
 </html>

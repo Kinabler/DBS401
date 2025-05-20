@@ -36,7 +36,7 @@ const verifyToken = async (req, res, next) => {
         if (req.path === '/user/list') {
             try {
                 const adminId = await getIdOfAdminFromDB(); // Await the Promise
-                console.log("Admin ID:", adminId);
+                // console.log("Admin ID:", adminId);
                 const isAdmin = decoded.userId === adminId;
 
                 if (!isAdmin) {

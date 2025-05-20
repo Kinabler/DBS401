@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DBS401 - User Profile</title>
+    <!-- Add google fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sansation:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap"
+        rel="stylesheet">
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="sansation-regular">
+    <!-- Navigation -->
+    <%- include('./partials/navbar') %>
+
+        <!-- Main Content Section -->
+        <section class="section" style="padding-top: 8rem;">
+            <div class="section-header">
+                <h2 class="section-title sansation-bold">My Profile</h2>
+            </div>
+
+            <div class="profile-container"
+                style="max-width: 800px; margin: 0 auto; background-color: var(--secondary); border-radius: 8px; padding: 2rem; box-shadow: 0 10px 30px -15px rgba(2, 12, 27, 0.7); border: 1px solid rgba(100, 255, 218, 0.1);">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div style="font-size: 5rem; color: var(--accent); margin-bottom: 1rem;">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <h3 style="font-size: 1.5rem; color: var(--text-primary); margin-bottom: 0.5rem;">
+                        <%= user.name %>
+                    </h3>
+                    <p style="color: var(--accent);">
+                        <%= user.role==='admin' ? 'Administrator' : 'Standard User' %>
+                    </p>
+                </div>
+
+                <div style="margin-top: 2rem;">
+                    <h4 style="color: var(--accent); margin-bottom: 1rem;">Account Information</h4>
+                    <p style="margin-bottom: 1rem;">This is a placeholder for your profile information. In a real
+                        application, this would display your account details and provide options to update your profile.
+                    </p>
+
+                    <div
+                        style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(100, 255, 218, 0.1); display: flex; justify-content: space-between; align-items: center;">
+                        <div style="color: var(--text-secondary);">
+                            <i class="fas fa-shield-alt"></i> Account secured with DBS401 protocols
+                        </div>
+                        <a href="/logout" class="cta-button"
+                            style="background-color: var(--secondary); color: var(--accent); border: 1px solid var(--accent);">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="logo sansation-bold" style="margin-bottom: 1rem;">DBS<span>401</span></div>
+            <ul class="footer-links">
+                <li><a href="#"><i class="fab fa-twitter"></i></a></li>
+                <li><a href="#"><i class="fab fa-linkedin"></i></a></li>
+                <li><a href="#"><i class="fab fa-github"></i></a></li>
+                <li><a href="#"><i class="fab fa-discord"></i></a></li>
+            </ul>
+            <p>© 2023 Database Security 401. All rights reserved.</p>
+        </footer>
+
+        <!-- Dropdown Menu Script -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const dropdowns = document.querySelectorAll('.dropdown');
+
+                // Toggle dropdown on click
+                dropdowns.forEach(dropdown => {
+                    const toggleBtn = dropdown.querySelector('.dropdown-toggle');
+
+                    toggleBtn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        dropdown.classList.toggle('active');
+                        dropdown.querySelector('.dropdown-menu').classList.toggle('show');
+
+                        // Close other dropdowns
+                        dropdowns.forEach(otherDropdown => {
+                            if (otherDropdown !== dropdown && otherDropdown.classList.contains('active')) {
+                                otherDropdown.classList.remove('active');
+                                otherDropdown.querySelector('.dropdown-menu').classList.remove('show');
+                            }
+                        });
+                    });
+                });
+
+                // Close dropdowns when clicking outside
+                document.addEventListener('click', function (e) {
+                    if (!e.target.closest('.dropdown')) {
+                        dropdowns.forEach(dropdown => {
+                            dropdown.classList.remove('active');
+                            dropdown.querySelector('.dropdown-menu').classList.remove('show');
+                        });
+                    }
+                });
+            });
+        </script>
+</body>
+
+</html>

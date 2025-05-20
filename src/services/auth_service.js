@@ -19,10 +19,10 @@ const authenticateUser = async (username, password) => {
 
         // Use parameterized query to prevent SQL injection
         const result = await connection.execute(
-            'SELECT * FROM users WHERE username = :username',
+            'SELECT TO_CHAR(USER_ID) as USER_ID, USERNAME, PASSWORD_HASH, EMAIL, ROLE, CREATED_AT, UPDATED_AT FROM users WHERE username = :username',
             { username }
         );
-
+        console.log(">> Checking user Id:", result.rows[0]);
         console.log(">> Query result:", result.rows);
 
         // Check if user exists - fix the logic error
@@ -78,8 +78,9 @@ const authenticateUser = async (username, password) => {
 
 // Generate JWT token
 const generateToken = (user) => {
+    console.log("Checking user Id:", user.id);
     const payload = {
-        userId: user.id,
+        userId: String(user.id),
         username: user.username,
         email: user.email,
         createAt: user.createAt,

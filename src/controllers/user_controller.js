@@ -102,6 +102,23 @@ const postLogin = async (req, res) => {
     }
 };
 
+// Add user profile page handler
+const getUserProfilePage = async (req, res) => {
+    try {
+        // You might want to fetch the user's data based on their token
+        // For now, we'll just render a basic profile page
+        res.render('profilePage', {
+            user: {
+                name: res.locals.username || 'User',
+                role: res.locals.userRole || 'user'
+            }
+        });
+    } catch (error) {
+        console.error('Error loading profile page:', error);
+        res.status(500).send('Error loading profile page');
+    }
+};
+
 module.exports = {
     getHomePage,
     getAboutPage,
@@ -110,5 +127,6 @@ module.exports = {
     getAddUserPage,
     getLoginPage,
     postLogin,
-    logout, // Export the new logout function
+    logout,
+    getUserProfilePage
 };
