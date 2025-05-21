@@ -6,6 +6,10 @@ const fs = require('fs');
 const cookieParser = require('cookie-parser'); // Add cookie-parser require
 const configViewEngine = require('./configs/viewEngine');
 const webRoute = require('./routes/web_router');
+const ensureDirectories = require('./middlewares/ensureDirectories');
+
+// Ensure all required directories exist
+ensureDirectories();
 
 const app = express();
 
@@ -16,8 +20,9 @@ const port = process.env.PORT || 8081;
 // Config view engine
 configViewEngine(app, express);
 
-// Serve static files
+// Serve static files from both locations
 app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.static(path.join(__dirname, 'public'))); // Add this line to serve from src/public
 
 // Express Json config
 app.use(express.json());

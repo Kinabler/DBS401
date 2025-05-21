@@ -97,7 +97,7 @@ const getUserByIdInDB = async (id) => {
 }
 
 const updateUserInDB = async (data) => {
-    const { profile_id, full_name, address, phone_number, hobbies, birthday, gender } = data;
+    const { profile_id, full_name, address, phone_number, hobbies, birthday, gender, avatar_url } = data;
     let connection;
     try {
         // Create a connection pool
@@ -114,7 +114,8 @@ const updateUserInDB = async (data) => {
             phone_number,
             hobbies,
             birthday,
-            gender
+            gender,
+            avatar_url
         });
 
         // Update using user_id instead of profile_id
@@ -126,6 +127,7 @@ const updateUserInDB = async (data) => {
                 hobbies = :hobbies
                 ${birthday ? ', birthday = :birthday' : ''}
                 ${gender ? ', gender = :gender' : ''}
+                ${avatar_url ? ', avatar_url = :avatar_url' : ''}
             WHERE user_id = :user_id`,  // Changed from profile_id to user_id
             {
                 full_name,
@@ -134,6 +136,7 @@ const updateUserInDB = async (data) => {
                 hobbies,
                 ...(birthday && { birthday }),
                 ...(gender && { gender }),
+                ...(avatar_url && { avatar_url }),
                 user_id: profile_id  // Use the JWT user_id as the user_id
             },
             { autoCommit: true }

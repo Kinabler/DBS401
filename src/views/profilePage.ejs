@@ -125,7 +125,27 @@
 
                             <!-- Tab Content: Edit Profile -->
                             <div id="edit-tab" class="tab-content">
-                                <form action="/user/profile/update" method="POST">
+                                <form action="/user/profile/update" method="POST" enctype="multipart/form-data">
+                                    <!-- Add avatar upload field -->
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="avatar">Profile Picture</label>
+                                            <div class="avatar-upload">
+                                                <div class="current-avatar">
+                                                    <img src="<%= user.avatarUrl %>" alt="Current Profile Picture"
+                                                        id="avatar-preview">
+                                                </div>
+                                                <div class="avatar-upload-container">
+                                                    <input type="file" id="avatar" name="avatar" accept="image/*">
+                                                    <div class="preview-change" id="preview-change-text">New image
+                                                        selected. Click Save to update your profile.</div>
+                                                    <p class="file-hint">Max size: 5MB. Supported formats: JPG, PNG,
+                                                        GIF, WEBP</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div class="form-row">
                                         <div class="form-group">
                                             <label for="name">Full Name</label>
@@ -257,6 +277,52 @@
                     }
                 }
 
+                // Image preview functionality
+                const avatarInput = document.getElementById('avatar');
+                const avatarPreview = document.getElementById('avatar-preview');
+                const previewChangeText = document.getElementById('preview-change-text');
+
+                avatarInput.addEventListener('change', function (event) {
+                    const file = event.target.files[0];
+
+                    if (file) {
+                        // Validate file type and size
+                        const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                        const maxSize = 5 * 1024 * 1024; // 5MB
+
+                        if (!validTypes.includes(file.type)) {
+                            alert('Please select a valid image file (JPEG, PNG, GIF, WEBP)');
+                            avatarInput.value = '';
+                            return;
+                        }
+
+                        if (file.size > maxSize) {
+                            alert('File size exceeds 5MB. Please select a smaller image.');
+                            avatarInput.value = '';
+                            return;
+                        }
+
+                        // Create a FileReader to read and preview the image
+                        const reader = new FileReader();
+
+                        reader.onload = function (e) {
+                            // Display the image preview
+                            avatarPreview.src = e.target.result;
+
+                            // Show the change notification
+                            previewChangeText.style.display = 'block';
+
+                            // Add a subtle animation to draw attention to the preview
+                            avatarPreview.style.animation = 'pulse 1s';
+                            setTimeout(() => {
+                                avatarPreview.style.animation = '';
+                            }, 1000);
+                        }
+
+                        reader.readAsDataURL(file);
+                    }
+                });
+
                 // Tab switching functionality
                 const tabs = document.querySelectorAll('.profile-tab');
                 const tabContents = document.querySelectorAll('.tab-content');
@@ -308,6 +374,23 @@
                 });
             });
         </script>
+
+        <!-- Add a keyframe animation for the pulse effect -->
+        <style>
+            @keyframes pulse {
+                0% {
+                    transform: scale(1);
+                }
+
+                50% {
+                    transform: scale(1.05);
+                }
+
+                100% {
+                    transform: scale(1);
+                }
+            }
+        </style>
 </body>
 
 </html>

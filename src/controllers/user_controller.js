@@ -167,7 +167,7 @@ const getUserProfilePage = async (req, res) => {
     }
 };
 
-// Add profile update handler
+// Update profile update handler to handle file uploads
 const updateUserProfile = async (req, res) => {
     try {
         const userId = req.user.userId; // Get from the token/session
@@ -175,6 +175,12 @@ const updateUserProfile = async (req, res) => {
 
         console.log('Updating profile for user:', userId);
         console.log('Profile update data:', { name, phone, address, hobbies, birthdate, gender });
+
+        // If there was an error with file upload, redirect with error message
+        if (req.fileUploadError) {
+            console.error('File upload error:', req.fileUploadError);
+            return res.redirect('/user/profile?error=true&message=' + encodeURIComponent(req.fileUploadError));
+        }
 
         // Update the fields that the user is allowed to change
         const userData = {
@@ -188,6 +194,11 @@ const updateUserProfile = async (req, res) => {
             gender: gender || null
         };
 
+        // Add avatar URL if a file was uploaded
+        if (req.filePath) {
+            userData.avatar_url = req.filePath;
+        }
+
         await updateUserInDB(userData);
 
         // Redirect back to the profile page with a success message
@@ -196,6 +207,22 @@ const updateUserProfile = async (req, res) => {
         console.error('Error updating profile:', error);
         res.redirect('/user/profile?error=true');
     }
+};
+
+// Update the middleware function to use the new path format
+const handleAvatarUpload = (req, res, next) => {
+    uploadAvatar(req, res, (err) => {
+        // ...existing code...
+
+        // File upload was successful
+        if (req.file) {
+            // Update path to reference src/public/uploads
+            req.filePath = `/uploads/profiles/${req.file.filename}`;
+            console.log(`File uploaded successfully: ${req.filePath}`);
+        }
+
+        // ...existing code...
+    });
 };
 
 module.exports = {
