@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="/css/base.css">
     <link rel="stylesheet" href="/css/layout.css">
     <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/profile.css">
     <link rel="stylesheet" href="/css/responsive.css">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -30,37 +31,196 @@
                 <h2 class="section-title sansation-bold">My Profile</h2>
             </div>
 
-            <div class="profile-container"
-                style="max-width: 800px; margin: 0 auto; background-color: var(--secondary); border-radius: 8px; padding: 2rem; box-shadow: 0 10px 30px -15px rgba(2, 12, 27, 0.7); border: 1px solid rgba(100, 255, 218, 0.1);">
-                <div style="text-align: center; margin-bottom: 2rem;">
-                    <div style="font-size: 5rem; color: var(--accent); margin-bottom: 1rem;">
-                        <i class="fas fa-user-circle"></i>
+            <div class="profile-container">
+                <!-- Profile Header -->
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <img src="<%= user.avatarUrl %>" alt="Profile Picture" class="profile-image" />
                     </div>
-                    <h3 style="font-size: 1.5rem; color: var(--text-primary); margin-bottom: 0.5rem;">
+                    <h3 class="profile-name">
                         <%= user.name %>
                     </h3>
-                    <p style="color: var(--accent);">
+                    <p class="profile-role">
                         <%= user.role==='admin' ? 'Administrator' : 'Standard User' %>
                     </p>
                 </div>
 
-                <div style="margin-top: 2rem;">
-                    <h4 style="color: var(--accent); margin-bottom: 1rem;">Account Information</h4>
-                    <p style="margin-bottom: 1rem;">This is a placeholder for your profile information. In a real
-                        application, this would display your account details and provide options to update your profile.
-                    </p>
-
-                    <div
-                        style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(100, 255, 218, 0.1); display: flex; justify-content: space-between; align-items: center;">
-                        <div style="color: var(--text-secondary);">
-                            <i class="fas fa-shield-alt"></i> Account secured with DBS401 protocols
-                        </div>
-                        <a href="/logout" class="cta-button"
-                            style="background-color: var(--secondary); color: var(--accent); border: 1px solid var(--accent);">
-                            <i class="fas fa-sign-out-alt"></i> Logout
-                        </a>
+                <!-- Notification Messages -->
+                <% if (typeof req !=='undefined' && req.query.updated==='true' ) { %>
+                    <div class="notification success">
+                        <i class="fas fa-check-circle"></i> Your profile has been updated successfully!
                     </div>
-                </div>
+                    <% } else if (typeof req !=='undefined' && req.query.error==='true' ) { %>
+                        <div class="notification error">
+                            <i class="fas fa-exclamation-circle"></i> There was an error updating your profile. Please
+                            try again.
+                        </div>
+                        <% } %>
+
+                            <!-- Profile Tabs -->
+                            <div class="profile-tabs">
+                                <div class="profile-tab active" data-tab="info">Personal Information</div>
+                                <div class="profile-tab" data-tab="edit">Edit Profile</div>
+                                <div class="profile-tab" data-tab="security">Security</div>
+                            </div>
+
+                            <!-- Tab Content: Personal Information -->
+                            <div id="info-tab" class="tab-content active">
+                                <div class="info-group">
+                                    <div class="info-label">Full Name</div>
+                                    <div class="info-value">
+                                        <%= user.name %>
+                                    </div>
+                                </div>
+
+                                <div class="info-group">
+                                    <div class="info-label">Email Address</div>
+                                    <div class="info-value">
+                                        <%= user.email || 'Not provided' %>
+                                    </div>
+                                </div>
+
+                                <div class="info-group">
+                                    <div class="info-label">Phone Number</div>
+                                    <div class="info-value">
+                                        <%= user.phone || 'Not provided' %>
+                                    </div>
+                                </div>
+
+                                <div class="info-group">
+                                    <div class="info-label">Address</div>
+                                    <div class="info-value">
+                                        <%= user.address || 'Not provided' %>
+                                    </div>
+                                </div>
+
+                                <div class="info-group">
+                                    <div class="info-label">Gender</div>
+                                    <div class="info-value">
+                                        <%= user.gender || 'Not specified' %>
+                                    </div>
+                                </div>
+
+                                <div class="info-group">
+                                    <div class="info-label">Date of Birth</div>
+                                    <div class="info-value">
+                                        <%= user.birthdate || 'Not specified' %>
+                                    </div>
+                                </div>
+
+                                <div class="info-group">
+                                    <div class="info-label">Hobbies</div>
+                                    <div class="info-value">
+                                        <%= user.hobbies || 'Not specified' %>
+                                    </div>
+                                </div>
+
+                                <div class="info-group">
+                                    <div class="info-label">Account Created</div>
+                                    <div class="info-value">
+                                        <%= user.joinDate || 'Not available' %>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tab Content: Edit Profile -->
+                            <div id="edit-tab" class="tab-content">
+                                <form action="/user/profile/update" method="POST">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="name">Full Name</label>
+                                            <input type="text" id="name" name="name" value="<%= user.name %>" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="phone">Phone Number</label>
+                                            <input type="tel" id="phone" name="phone" value="<%= user.phone || '' %>">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="address">Address</label>
+                                            <textarea id="address" name="address"
+                                                rows="3"><%= user.address || '' %></textarea>
+                                        </div>
+                                    </div>
+
+                                    <!-- Add birthdate field -->
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="birthdate">Date of Birth</label>
+                                            <input type="date" id="birthdate" name="birthdate">
+                                        </div>
+                                    </div>
+
+                                    <!-- Add gender field -->
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="gender">Gender</label>
+                                            <select id="gender" name="gender" class="form-control">
+                                                <option value="" <%=!user.gender || user.gender==='Not specified'
+                                                    ? 'selected' : '' %>>Not
+                                                    specified</option>
+                                                <option value="Male" <%=user.gender==='Male' ? 'selected' : '' %>>Male
+                                                </option>
+                                                <option value="Female" <%=user.gender==='Female' ? 'selected' : '' %>
+                                                    >Female
+                                                </option>
+                                                <option value="Other" <%=user.gender==='Other' ? 'selected' : '' %>
+                                                    >Other
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="hobbies">Hobbies (comma separated)</label>
+                                            <input type="text" id="hobbies" name="hobbies"
+                                                value="<%= user.hobbies || '' %>">
+                                        </div>
+                                    </div>
+
+                                    <div style="display: flex; justify-content: flex-end; margin-top: 2rem;">
+                                        <button type="submit" class="cta-button">
+                                            <i class="fas fa-save"></i> Save Changes
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Tab Content: Security -->
+                            <div id="security-tab" class="tab-content">
+                                <div class="security-section">
+                                    <h4 style="color: var(--accent); margin-bottom: 1rem;">Account Security</h4>
+
+                                    <div class="security-item">
+                                        <span class="security-icon"><i class="fas fa-shield-alt"></i></span>
+                                        <span>Your account is protected with DBS401 security protocols</span>
+                                    </div>
+
+                                    <div class="security-item">
+                                        <span class="security-icon"><i class="fas fa-user-lock"></i></span>
+                                        <span>Last login: <%= new Date().toLocaleDateString() %> at <%= new
+                                                    Date().toLocaleTimeString() %></span>
+                                    </div>
+
+                                    <div class="security-item">
+                                        <span class="security-icon"><i class="fas fa-fingerprint"></i></span>
+                                        <span>Enhanced identity protection active</span>
+                                    </div>
+
+                                    <div style="margin-top: 2rem; text-align: right;">
+                                        <a href="/logout" class="cta-button"
+                                            style="background-color: var(--secondary); color: var(--accent); border: 1px solid var(--accent);">
+                                            <i class="fas fa-sign-out-alt"></i> Logout
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
             </div>
         </section>
 
@@ -76,9 +236,46 @@
             <p>© 2023 Database Security 401. All rights reserved.</p>
         </footer>
 
-        <!-- Dropdown Menu Script -->
+        <!-- Tab Switching and Dropdown Menu Script -->
         <script>
             document.addEventListener('DOMContentLoaded', function () {
+                // Format birthdate for date input
+                const birthdateInput = document.getElementById('birthdate');
+                const birthdateValue = "<%= user.birthdate %>";
+
+                if (birthdateValue && birthdateValue !== 'Not specified') {
+                    try {
+                        // Parse the date from the displayed format (MM/DD/YYYY)
+                        const parts = birthdateValue.split('/');
+                        if (parts.length === 3) {
+                            // Convert to YYYY-MM-DD format required by date input
+                            const formattedDate = `${parts[2]}-${parts[0].padStart(2, '0')}-${parts[1].padStart(2, '0')}`;
+                            birthdateInput.value = formattedDate;
+                        }
+                    } catch (e) {
+                        console.error('Error formatting date:', e);
+                    }
+                }
+
+                // Tab switching functionality
+                const tabs = document.querySelectorAll('.profile-tab');
+                const tabContents = document.querySelectorAll('.tab-content');
+
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', function () {
+                        const tabId = this.getAttribute('data-tab');
+
+                        // Remove active class from all tabs and contents
+                        tabs.forEach(t => t.classList.remove('active'));
+                        tabContents.forEach(c => c.classList.remove('active'));
+
+                        // Add active class to current tab and content
+                        this.classList.add('active');
+                        document.getElementById(tabId + '-tab').classList.add('active');
+                    });
+                });
+
+                // Dropdown menu functionality (existing code)
                 const dropdowns = document.querySelectorAll('.dropdown');
 
                 // Toggle dropdown on click

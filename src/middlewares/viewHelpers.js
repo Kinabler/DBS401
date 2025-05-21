@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { getUserRoleFromDB } = require('../services/CRUD_service'); // Assume this function fetches user role from DB
+const { getUserRoleFromDB, getUserByIdInDB } = require('../services/CRUD_service');
 
 /**
  * Middleware to check if user is logged in and add that info
@@ -9,6 +9,7 @@ const addLoginStatus = async (req, res, next) => {
     // Default to not logged in
     res.locals.isLoggedIn = false;
     res.locals.userRole = null;
+    res.locals.avatarUrl = '/uploads/default_profile.webp'; // Default avatar
 
     // Check for auth token
     const token = req.cookies?.auth_token;
@@ -21,15 +22,25 @@ const addLoginStatus = async (req, res, next) => {
             // Set login status and user role
             res.locals.isLoggedIn = true;
             userId = decoded.userId || null;
-            // Get user Role in database from userId
-            const userRole = await getUserRoleFromDB(userId); // Assume this function fetches the role from the database
 
-            res.locals.userRole = userRole || "user";  // Default to 'user' if not specified
+            if (userId) {
+                // Get user data from database
+                try {
+                    const userData = await getUserByIdInDB(userId);
+                    if (userData && userData.length > 0) {
+                        // Set avatar URL from database if available (column index 9)
+                        res.locals.avatarUrl = userData[0][9] || '/uploads/default_profile.webp';
+                    }
+                } catch (dbError) {
+                    console.error('Error fetching user data:', dbError);
+                }
+
+                // Get user Role in database from userId
+                const userRole = await getUserRoleFromDB(userId);
+                res.locals.userRole = userRole || "user";  // Default to 'user' if not specified
+            }
+
             res.locals.username = decoded.username || 'User';
-
-            // Debug output
-            // console.log(`User authenticated: ${res.locals.username}, Role: ${res.locals.userRole}`);
-
         } catch (error) {
             console.log('Invalid token detected:', error.message);
         }

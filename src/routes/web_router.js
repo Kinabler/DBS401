@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getHomePage, getAboutPage, getListUserPage, postEditUserById, getAddUserPage, getLoginPage, postLogin, logout, getUserProfilePage } = require('../controllers/user_controller');
+const { getHomePage, getAboutPage, getListUserPage, postEditUserById, getAddUserPage, getLoginPage, postLogin, logout, getUserProfilePage, updateUserProfile } = require('../controllers/user_controller');
 const { verifyToken } = require('../middlewares/accessToken');
 const { addLoginStatus } = require('../middlewares/viewHelpers');
 
@@ -22,7 +22,8 @@ router.post('/user/edit/:id', verifyToken, checkAdminRole, postEditUserById);
 router.get('/user/create', verifyToken, checkAdminRole, getAddUserPage);
 
 // Profile routes - available to all logged-in users
-router.get('/user/profile', verifyToken, getUserProfilePage); // You'll need to add this controller function
+router.get('/user/profile', verifyToken, getUserProfilePage);
+router.post('/user/profile/update', verifyToken, updateUserProfile); // Add this new route
 
 module.exports = router;
 

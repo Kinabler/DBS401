@@ -102,20 +102,99 @@ const postLogin = async (req, res) => {
     }
 };
 
-// Add user profile page handler
+// Update user profile page handler
 const getUserProfilePage = async (req, res) => {
     try {
-        // You might want to fetch the user's data based on their token
-        // For now, we'll just render a basic profile page
-        res.render('profilePage', {
-            user: {
-                name: res.locals.username || 'User',
-                role: res.locals.userRole || 'user'
+        // Get user ID from the request (set by verifyToken middleware)
+        const userId = req.user.userId;
+
+        if (!userId) {
+            console.log('No user ID found in token');
+            return res.redirect('/login');
+        }
+
+        // Fetch complete user data from the database
+        try {
+            const userData = await getUserByIdInDB(userId);
+
+            if (!userData || userData.length === 0) {
+                console.log('No user profile found for ID:', userId);
+                // Temporarily just show a basic profile with minimal info
+                return res.render('profilePage', {
+                    user: {
+                        name: res.locals.username || 'User',
+                        role: res.locals.userRole || 'user',
+                        email: res.locals.email || '',
+                        avatarUrl: '/uploads/default_profile.webp' // Default avatar
+                    },
+                    req: req
+                });
             }
-        });
+
+            // Format the user data for the template
+            const user = {
+                id: userId,
+                name: userData[0][2] || res.locals.username || 'User', // full_name
+                role: res.locals.userRole || 'user',
+                email: res.locals.email || '',
+                phone: userData[0][4] || '', // phone_number
+                address: userData[0][3] || '', // address
+                hobbies: userData[0][5] || '', // hobbies
+                gender: userData[0][8] || 'Not specified', // gender
+                birthdate: userData[0][6] ? new Date(userData[0][6]).toLocaleDateString() : 'Not specified', // birthday
+                joinDate: userData[0][7] ? new Date(userData[0][7]).toLocaleDateString() : 'Not available', // created_at
+                avatarUrl: userData[0][9] || '/uploads/default_profile.webp' // avatar_url or default
+            };
+
+            console.log('Prepared user data for profile:', user);
+
+            // Pass the updated user object to the template
+            res.render('profilePage', { user, req });
+        } catch (dbError) {
+            console.error('Database error when fetching user profile:', dbError);
+            // Fallback to basic profile
+            res.render('profilePage', {
+                user: {
+                    name: res.locals.username || 'User',
+                    role: res.locals.userRole || 'user'
+                },
+                req: req
+            });
+        }
     } catch (error) {
         console.error('Error loading profile page:', error);
-        res.status(500).send('Error loading profile page');
+        res.status(500).render('500Page');
+    }
+};
+
+// Add profile update handler
+const updateUserProfile = async (req, res) => {
+    try {
+        const userId = req.user.userId; // Get from the token/session
+        const { name, phone, address, hobbies, birthdate, gender } = req.body;
+
+        console.log('Updating profile for user:', userId);
+        console.log('Profile update data:', { name, phone, address, hobbies, birthdate, gender });
+
+        // Update the fields that the user is allowed to change
+        const userData = {
+            profile_id: userId,  // This is actually the user_id from JWT
+            full_name: name,
+            phone_number: phone,
+            address: address,
+            hobbies: hobbies,
+            // Add new fields
+            birthday: birthdate ? new Date(birthdate) : undefined,
+            gender: gender || null
+        };
+
+        await updateUserInDB(userData);
+
+        // Redirect back to the profile page with a success message
+        res.redirect('/user/profile?updated=true');
+    } catch (error) {
+        console.error('Error updating profile:', error);
+        res.redirect('/user/profile?error=true');
     }
 };
 
@@ -128,5 +207,6 @@ module.exports = {
     getLoginPage,
     postLogin,
     logout,
-    getUserProfilePage
+    getUserProfilePage,
+    updateUserProfile  // Export the new function
 };

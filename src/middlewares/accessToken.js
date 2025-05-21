@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
-const { getIdOfAdminFromDB } = require('../services/CRUD_service');
+const { getIdOfAdminFromDB, getUserRoleFromDB } = require('../services/CRUD_service');
 const { handle403 } = require('./errorHandlers');
 
 // Secret key for JWT - in production, store this in environment variables
@@ -31,6 +31,21 @@ const verifyToken = async (req, res, next) => {
         // Verify token synchronously to properly handle errors
         const decoded = jwt.verify(token, JWT_SECRET);
         req.user = decoded;
+
+        // Make user data available to views via res.locals
+        res.locals.userId = decoded.userId;
+        res.locals.username = decoded.username;
+        res.locals.email = decoded.email || '';
+
+        // Get user role from the database using userId
+        try {
+            const userRole = await getUserRoleFromDB(decoded.userId);
+            res.locals.userRole = userRole || 'user'; // Default to 'user' if not found
+            console.log('Verified token for user:', decoded.username, 'with role:', userRole);
+        } catch (roleErr) {
+            console.error("Error fetching user role:", roleErr);
+            res.locals.userRole = 'user'; // Default to 'user' on error
+        }
 
         // Special authorization for the user list endpoint
         if (req.path === '/user/list') {

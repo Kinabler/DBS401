@@ -204,3 +204,144 @@
     justify-content: center;
     gap: 0.5rem;
 }
+
+/* Navbar profile image */
+.nav-profile-img {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 8px;
+    border: 1px solid var(--accent);
+    box-shadow: 0 0 0 2px rgba(100, 255, 218, 0.3);
+}
+
+/* Improved Dropdown Menu Styles */
+.dropdown {
+    position: relative;
+}
+
+.dropdown-toggle {
+    display: flex;
+    align-items: center;
+    transition: color 0.3s ease;
+}
+
+.dropdown-toggle i {
+    transition: transform 0.3s ease;
+    margin-left: 0.3rem;
+    font-size: 0.8rem;
+}
+
+.dropdown.active .dropdown-toggle i {
+    transform: rotate(180deg);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: calc(100% + 0.75rem);
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background-color: var(--secondary);
+    min-width: 200px;
+    border-radius: 8px;
+    padding: 0.75rem 0;
+    box-shadow: 0 10px 30px -5px rgba(2, 12, 27, 0.7);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    z-index: 1001;
+    border: 1px solid rgba(100, 255, 218, 0.1);
+    pointer-events: none;
+}
+
+/* Triangle indicator on top of dropdown */
+.dropdown-menu::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 12px;
+    height: 12px;
+    background-color: var(--secondary);
+    border-top: 1px solid rgba(100, 255, 218, 0.1);
+    border-left: 1px solid rgba(100, 255, 218, 0.1);
+    transform: translateX(-50%) rotate(45deg);
+    z-index: -1;
+}
+
+.dropdown-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    padding: 0.85rem 1.5rem;
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.dropdown-item:hover {
+    color: var(--accent);
+    background-color: rgba(100, 255, 218, 0.05);
+    padding-left: 1.75rem;
+}
+
+.dropdown-item:not(:last-child) {
+    border-bottom: 1px solid rgba(100, 255, 218, 0.05);
+}
+
+/* Adding a subtle indicator for hover state */
+.dropdown-item:hover::before {
+    content: '';
+    position: absolute;
+    left: 0.75rem;
+    width: 3px;
+    height: 60%;
+    background-color: var(--accent);
+    border-radius: 2px;
+}
+
+/* Form Select Styling */
+.form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: rgba(0, 0, 0, 0.1);
+    color: var(--text-primary);
+    border: 1px solid rgba(100, 255, 218, 0.2);
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364ffda' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1em;
+    cursor: pointer;
+    padding-right: 2rem;
+}
+
+.form-group select:focus {
+    border-color: var(--accent);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(100, 255, 218, 0.1);
+}
+
+.form-group select:hover {
+    border-color: var(--accent);
+}
+
+/* Style for select options */
+.form-group select option {
+    background-color: var(--secondary);
+    color: var(--text-primary);
+    padding: 8px;
+}

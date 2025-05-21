@@ -54,28 +54,36 @@ const getUserByIdInDB = async (id) => {
         // Get a connection from the pool
         connection = await pool.getConnection();
 
-        // Execute a query to fetch user data - now supporting both profile_id and random_id lookups
-        let result;
+        // Debug the incoming ID
+        console.log('Fetching user with ID:', id);
 
-        // Determine if the id is numeric (profile_id) or string (random_id)
-        if (!isNaN(id)) {
-            // If numeric, query by profile_id
-            result = await connection.execute(
-                'SELECT up.*, u.random_id FROM user_profiles up JOIN users u ON up.user_id = u.user_id WHERE up.profile_id = :id',
-                [id]
-            );
-        } else {
-            // If string, assume it's a random_id
-            result = await connection.execute(
-                'SELECT up.*, u.random_id FROM user_profiles up JOIN users u ON up.user_id = u.user_id WHERE up.random_id = :id OR u.random_id = :id',
-                [id]
-            );
-        }
+        // Execute a query to fetch user data by user_id (not profile_id)
+        // Updated to include avatar_url column
+        const result = await connection.execute(
+            `SELECT 
+                up.profile_id,
+                up.user_id, 
+                up.full_name, 
+                up.address, 
+                up.phone_number, 
+                up.hobbies, 
+                up.birthday,
+                u.created_at,
+                NVL(up.gender, 'Unknown') as gender,
+                NVL(up.avatar_url, '/uploads/default_profile.webp') as avatar_url
+            FROM user_profiles up 
+            JOIN users u ON up.user_id = u.user_id 
+            WHERE u.user_id = :id`,
+            [id]
+        );
 
-        // Return the result set
+        console.log('User lookup result rows:', result.rows ? result.rows.length : 0);
+
+        // Return the result rows
         return result.rows;
     } catch (err) {
         console.error('Error fetching user by ID:', err);
+        throw err; // Rethrow the error so we can catch it in the controller
     } finally {
         if (connection) {
             try {
@@ -100,7 +108,7 @@ const updateUserInDB = async (data) => {
 
         // Log the data being sent to the database for debugging
         console.log('Updating user with data:', {
-            profile_id,
+            user_id: profile_id, // Note: profile_id is actually user_id from the JWT
             full_name,
             address,
             phone_number,
@@ -109,54 +117,27 @@ const updateUserInDB = async (data) => {
             gender
         });
 
-        let result;
-
-        // Support updating by either profile_id or random_id
-        if (profile_id) {
-            result = await connection.execute(
-                `UPDATE user_profiles 
-                SET full_name = :full_name, 
-                    address = :address, 
-                    phone_number = :phone_number, 
-                    hobbies = :hobbies, 
-                    birthday = :birthday, 
-                    gender = :gender
-                WHERE profile_id = :profile_id`,
-                {
-                    full_name,
-                    address,
-                    phone_number,
-                    hobbies,
-                    birthday,
-                    gender,
-                    profile_id
-                },
-                { autoCommit: true }
-            );
-        } else if (random_id) {
-            result = await connection.execute(
-                `UPDATE user_profiles 
-                SET full_name = :full_name, 
-                    address = :address, 
-                    phone_number = :phone_number, 
-                    hobbies = :hobbies, 
-                    birthday = :birthday, 
-                    gender = :gender
-                WHERE random_id = :random_id`,
-                {
-                    full_name,
-                    address,
-                    phone_number,
-                    hobbies,
-                    birthday,
-                    gender,
-                    random_id
-                },
-                { autoCommit: true }
-            );
-        } else {
-            throw new Error('Either profile_id or random_id is required for update');
-        }
+        // Update using user_id instead of profile_id
+        const result = await connection.execute(
+            `UPDATE user_profiles 
+            SET full_name = :full_name, 
+                address = :address, 
+                phone_number = :phone_number, 
+                hobbies = :hobbies
+                ${birthday ? ', birthday = :birthday' : ''}
+                ${gender ? ', gender = :gender' : ''}
+            WHERE user_id = :user_id`,  // Changed from profile_id to user_id
+            {
+                full_name,
+                address,
+                phone_number,
+                hobbies,
+                ...(birthday && { birthday }),
+                ...(gender && { gender }),
+                user_id: profile_id  // Use the JWT user_id as the user_id
+            },
+            { autoCommit: true }
+        );
 
         console.log('Update result:', result);
 

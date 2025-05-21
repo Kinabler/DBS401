@@ -22,8 +22,8 @@ const authenticateUser = async (username, password) => {
             'SELECT TO_CHAR(USER_ID) as USER_ID, USERNAME, PASSWORD_HASH, EMAIL, ROLE, CREATED_AT, UPDATED_AT FROM users WHERE username = :username',
             { username }
         );
-        console.log(">> Checking user Id:", result.rows[0]);
-        console.log(">> Query result:", result.rows);
+        console.log(">> Checking user Id:", result.rows[0][0]);
+        console.log(">> Query result:", result.rows[0]);
 
         // Check if user exists - fix the logic error
         if (!result.rows || result.rows.length === 0) {
