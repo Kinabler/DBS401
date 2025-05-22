@@ -8,7 +8,7 @@ sudo apt-get update
 sudo apt-get install docker.io -y
 sudo apt install docker-compose -y
 sudo apt install nginx -y
-sudo systemctl status nginx || echo "Nginx might not be running, continuing anyway..."
+sudo systemctl status nginx --no-pager
 sudo apt install certbot python3-certbot-nginx -y
 
 # Cài đặt project (require auth)
@@ -29,9 +29,9 @@ sudo ./init-db.sh
 echo "Making config file for nginx..."
 cat > sigrop.site << 'EOF'
 server {
-    listen 443 ssl;
+    listen 80;
     server_name sigrop.site www.sigrop.site;
-        
+
     location / {
         proxy_pass http://127.0.0.1:8080;
         proxy_http_version 1.1;
