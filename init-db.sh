@@ -34,7 +34,16 @@ echo "Database user created successfully!"
 
 # Copy the SQL file to the container
 echo "Copying database script to container..."
-docker-compose cp database/user.sql oracle-db:/tmp/oracle_setup.sql
+# Get the container ID first
+CONTAINER_ID=$(docker-compose ps -q oracle-db)
+# Then copy the file
+docker cp database/user.sql $CONTAINER_ID:/tmp/oracle_setup.sql
+
+if [ ! -f "database/user.sql" ]; then
+  echo "Error: database/user.sql not found!"
+  exit 1
+fi
+
 
 # Execute the SQL file
 echo "Running database setup script..."

@@ -23,18 +23,11 @@ echo "Initializing database..."
 sudo chmod +x init-db.sh
 sudo ./init-db.sh
 # Enable port from outside
-sudo ufw allow 1521/tcp
-sudo ufw allow 8080/tcp
+# sudo ufw allow 1521/tcp
+# sudo ufw allow 8080/tcp
 
 echo "Making config file for nginx..."
 cat > sigrop.site << 'EOF'
-server {
-    listen 80;
-    server_name sigrop.site www.sigrop.site;
-    
-    return 301 https://$host$request_uri;
-}
-
 server {
     listen 443 ssl;
     server_name sigrop.site www.sigrop.site;
