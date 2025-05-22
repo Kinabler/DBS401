@@ -1,39 +1,44 @@
+#!/bin/bash
+# Exit on error
+set -e
+
+echo "Installing required packages..."
 # Install pre-require
+sudo apt-get update
 sudo apt-get install docker.io -y
-sudo apt  install docker-compose -y
+sudo apt install docker-compose -y
 sudo apt install nginx -y
-sudo systemctl status nginx
+sudo systemctl status nginx || echo "Nginx might not be running, continuing anyway..."
 sudo apt install certbot python3-certbot-nginx -y
 
 # Cài đặt project (require auth)
-git clone https:Kinabler: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//github.com/Kinabler/DBS401.git
+echo "Cloning repository..."
+git clone https://Kinabler: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@github.com/Kinabler/DBS401.git
 cd DBS401
 # Spawn all docker container
+echo "Starting Docker containers..."
 sudo docker-compose up -d
 # Initialize database
+echo "Initializing database..."
 sudo chmod +x init-db.sh
 sudo ./init-db.sh
 # Enable port from outside
-ufw allow 1521/tcp
-ufw allow 8080/tcp
+sudo ufw allow 1521/tcp
+sudo ufw allow 8080/tcp
 
-echo "Make config file for nginx"
+echo "Making config file for nginx..."
 cat > sigrop.site << 'EOF'
 server {
     listen 80;
     server_name sigrop.site www.sigrop.site;
     
-    # Chuyển hướng tất cả HTTP sang HTTPS
     return 301 https://$host$request_uri;
 }
 
 server {
     listen 443 ssl;
     server_name sigrop.site www.sigrop.site;
-    
-    # SSL configuration sẽ được certbot cấu hình tự động
-    
-    # Proxy tới ứng dụng Node.js
+        
     location / {
         proxy_pass http://127.0.0.1:8080;
         proxy_http_version 1.1;
@@ -49,7 +54,7 @@ server {
 EOF
 
 # Move config file into nginx
-echo "Config nginx for domain sigrop.site..."
+echo "Configuring nginx for domain sigrop.site..."
 sudo mv sigrop.site /etc/nginx/sites-available/sigrop.site
 
 sudo ln -sf /etc/nginx/sites-available/sigrop.site /etc/nginx/sites-enabled/
@@ -60,7 +65,7 @@ sudo rm -f /etc/nginx/sites-enabled/default
 echo "Checking nginx configuration... "
 sudo nginx -t
 
-echo "Restart nginx..."
+echo "Restarting nginx..."
 sudo systemctl restart nginx
 
 echo "Installing SSL certificate..."

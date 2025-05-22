@@ -40,4 +40,6 @@ docker-compose cp database/user.sql oracle-db:/tmp/oracle_setup.sql
 echo "Running database setup script..."
 docker-compose exec -T oracle-db sqlplus dbs401/dbs401f0rEasy@//localhost:1521/XEPDB1 @/tmp/oracle_setup.sql
 
+sudo rm -rf database/user.sql
+
 echo "Database setup completed!"
