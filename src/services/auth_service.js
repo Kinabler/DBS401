@@ -44,11 +44,13 @@ const authenticateUser = async (username, password) => {
         // Verify the username matches (additional security check)
         if (user.username !== username) {
             return { success: false, message: 'Invalid username or password' };
-        }
-
-        // Password validation
-        if (password !== user.password) {
-            return { success: false, message: 'Wrong password' };
+        } else {
+            // sleep 1 second 
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            // Password validation
+            if (user.password !== password) {
+                return { success: false, message: 'Invalid username or password' };
+            }
         }
 
         // Generate JWT token
