@@ -15,9 +15,17 @@ services:
       # Important: use the service name instead of localhost
       - DB_CONNECT_STRING=oracle-db:1521/XEPDB1
       - JWT_SECRET=0a0dd7f9-5f45-485d-9ffd-054651192402
+    volumes:
+      # Mount source code directory to container
+      - ./src:/app/src
+      # Mount public assets
+      - ./public:/app/public
     depends_on:
-      - oracle-db
-    restart: unless-stopped
+      oracle-db:
+        condition: service_healthy
+    restart: "no"
+    command: >
+      sh -c "npm install && npm run start"
 
   oracle-db:
     image: container-registry.oracle.com/database/express:21.3.0-xe
@@ -28,13 +36,17 @@ services:
       - ORACLE_PWD=let-me-in
       - ORACLE_CHARACTERSET=AL32UTF8
     volumes:
-      - oracle-data:/opt/oracle/oradata
-    restart: unless-stopped
+      - ./init-scripts:/opt/oracle/scripts/setup
+      # Don't use persistent storage, so database resets on each restart
+      # - oracle-data:/opt/oracle/oradata
+    restart: "no"
     healthcheck:
       test: [ "CMD", "sqlplus", "-L", "system/let-me-in@//localhost:1521/XEPDB1", "AS", "SYSDBA", "<<< 'SELECT 1 FROM DUAL;'" ]
-      interval: 30s
+      interval: 10s
       timeout: 10s
-      retries: 5
+      retries: 10
+      start_period: 40s
 
 volumes:
+  # Keep this definition for compatibility even if we're not using it
   oracle-data:

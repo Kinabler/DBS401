@@ -1,6 +1,6 @@
 #!/bin/bash
 echo "Waiting for Oracle Database to be ready..."
-sleep 60  # Initial wait time for Oracle to start
+sleep 10  # Initial wait time for Oracle to start
 
 echo "Checking SQLPlus version..."
 # Check sqlplus version

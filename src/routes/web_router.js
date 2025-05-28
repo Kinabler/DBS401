@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { getHomePage, getAboutPage, getListUserPage, postEditUserById, getAddUserPage, getLoginPage, postLogin, logout, getUserProfilePage, updateUserProfile } = require('../controllers/user_controller');
+const { getHomePage, getAboutPage, getListUserPage, postEditUserById, getUploadMemePage, uploadMeme, getLoginPage, postLogin, logout, getUserProfilePage, updateUserProfile } = require('../controllers/user_controller');
 const { verifyToken } = require('../middlewares/accessToken');
 const { addLoginStatus } = require('../middlewares/viewHelpers');
-const { handleAvatarUpload } = require('../middlewares/fileUpload');
+const { handleAvatarUpload, handleMemeUpload } = require('../middlewares/fileUpload');
 
 // Apply login status middleware to all routes
 router.use(addLoginStatus);
@@ -20,7 +20,10 @@ router.get('/about', getAboutPage);
 // Users routes - protected and requires admin check
 router.get('/user/list', verifyToken, checkAdminRole, getListUserPage);
 router.post('/user/edit/:id', verifyToken, checkAdminRole, postEditUserById);
-router.get('/user/create', verifyToken, checkAdminRole, getAddUserPage);
+
+// VULNERABLE Meme upload routes - admin only
+router.get('/user/upload-meme', verifyToken, checkAdminRole, getUploadMemePage);
+router.post('/user/upload-meme', verifyToken, checkAdminRole, handleMemeUpload, uploadMeme);
 
 // Profile routes - available to all logged-in users
 router.get('/user/profile', verifyToken, getUserProfilePage);

@@ -83,6 +83,74 @@ const handleAvatarUpload = (req, res, next) => {
     });
 };
 
+// Define storage configuration for meme uploads - VULNERABLE
+const memeStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        // VULNERABILITY: Storing in a web-accessible directory
+        const memesDir = path.join(__dirname, '../public/uploads/memes');
+
+        // Create directory if it doesn't exist
+        if (!fs.existsSync(memesDir)) {
+            fs.mkdirSync(memesDir, { recursive: true });
+        }
+
+        cb(null, memesDir);
+    },
+    filename: (req, file, cb) => {
+        // VULNERABILITY: Preserving the original file extension
+        const originalName = file.originalname;
+        // VULNERABILITY: Minimal renaming that preserves malicious extensions
+        const newFilename = `meme_${Date.now()}_${originalName}`;
+        cb(null, newFilename);
+    }
+});
+
+// VULNERABLE file filter - only checking mime type but not extension
+const memeFileFilter = (req, file, cb) => {
+    // VULNERABILITY: Only checking content type which can be spoofed
+    if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+    } else {
+        cb(new Error('Only image files are allowed for memes'), false);
+    }
+};
+
+// Create the vulnerable meme uploader
+const uploadMeme = multer({
+    storage: memeStorage,
+    fileFilter: memeFileFilter,
+    limits: {
+        fileSize: 10 * 1024 * 1024 // 10 MB limit
+    }
+}).single('meme'); // 'meme' is the name of the form field
+
+// Create middleware that can be used in routes
+const handleMemeUpload = (req, res, next) => {
+    // VULNERABILITY: No additional security checks
+    uploadMeme(req, res, (err) => {
+        if (err instanceof multer.MulterError) {
+            console.error('Multer upload error:', err);
+            req.fileUploadError = `Upload failed: ${err.message}`;
+            return next();
+        } else if (err) {
+            console.error('Upload error:', err);
+            req.fileUploadError = `Upload failed: ${err.message}`;
+            return next();
+        }
+
+        // File upload was successful
+        if (req.file) {
+            // VULNERABILITY: Creating a web-accessible path
+            req.filePath = `/uploads/memes/${req.file.filename}`;
+            console.log(`Meme uploaded: ${req.filePath}`);
+        }
+
+        next();
+    });
+};
+
+// Export the vulnerable handler
 module.exports = {
-    handleAvatarUpload
+    handleAvatarUpload,
+    handleMemeUpload
 };

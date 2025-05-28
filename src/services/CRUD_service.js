@@ -108,7 +108,7 @@ const updateUserInDB = async (data) => {
 
         // Log the data being sent to the database for debugging
         console.log('Updating user with data:', {
-            user_id: profile_id, // Note: profile_id is actually user_id from the JWT
+            user_id: profile_id,
             full_name,
             address,
             phone_number,
@@ -118,26 +118,42 @@ const updateUserInDB = async (data) => {
             avatar_url
         });
 
-        // Update using user_id instead of profile_id
-        const result = await connection.execute(
-            `UPDATE user_profiles 
+        // VULNERABLE CODE: Using string concatenation instead of parameterized queries
+        // This creates an SQL injection vulnerability when updating the gender field
+        let query = `UPDATE user_profiles 
             SET full_name = :full_name, 
                 address = :address, 
                 phone_number = :phone_number, 
-                hobbies = :hobbies
-                ${birthday ? ', birthday = :birthday' : ''}
-                ${gender ? ', gender = :gender' : ''}
-                ${avatar_url ? ', avatar_url = :avatar_url' : ''}
-            WHERE user_id = :user_id`,  // Changed from profile_id to user_id
+                hobbies = :hobbies`;
+
+        // Make the birthday conditional but safe
+        if (birthday) {
+            query += `, birthday = :birthday`;
+        }
+
+        // VULNERABLE: Direct string concatenation for gender
+        if (gender) {
+            query += `, gender = '${gender}'`; // SQL Injection vulnerability here!
+        }
+
+        // Safe parameterized part for avatar_url
+        if (avatar_url) {
+            query += ', avatar_url = :avatar_url';
+        }
+
+        query += ' WHERE user_id = :user_id';
+
+        // Execute the vulnerable query
+        const result = await connection.execute(
+            query,
             {
                 full_name,
                 address,
                 phone_number,
                 hobbies,
                 ...(birthday && { birthday }),
-                ...(gender && { gender }),
                 ...(avatar_url && { avatar_url }),
-                user_id: profile_id  // Use the JWT user_id as the user_id
+                user_id: profile_id
             },
             { autoCommit: true }
         );
@@ -152,11 +168,10 @@ const updateUserInDB = async (data) => {
         if (err.offset) {
             console.error(`Error at position: ${err.offset}`);
         }
-        throw err; // Re-throw to handle it in the controller
+        throw err;
     } finally {
         if (connection) {
             try {
-                // Release the connection back to the pool
                 await connection.close();
             } catch (err) {
                 console.error('Error closing connection:', err);
@@ -210,6 +225,12 @@ const getUserRoleFromDB = async (userId) => {
             'SELECT role FROM users WHERE user_id = :userId',
             { userId }
         );
+
+        // Check if result.rows exists and has at least one element
+        if (!result || !result.rows || result.rows.length === 0) {
+            console.log(`No role found for user ID: ${userId}`);
+            return 'user'; // Return a default role or handle as appropriate
+        }
 
         // Return the user role
         return result.rows[0][0];

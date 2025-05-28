@@ -1,6 +1,13 @@
 const e = require('express');
 const { getUserFromDB, getUserByIdInDB, updateUserInDB } = require('../services/CRUD_service');
 const { authenticateUser } = require('../services/auth_service');
+const {
+    validateUserId,
+    validateLoginData,
+    validateUserProfileData,
+    validateFileUpload
+} = require('../utils/inputValidator');
+const { get } = require('../routes/web_router');
 
 const getHomePage = async (req, res) => {
     res.render('homePage');
@@ -20,26 +27,39 @@ const postEditUserById = async (req, res) => {
         const { id } = req.params;
         const { name, address, phone, hobbies, birthdate, gender, userId } = req.body;
 
-        // console.log('Form data received:', req.body);
+        // Validate the ID parameter
+        const idValidation = validateUserId(id || userId);
+        if (!idValidation.success) {
+            console.error('Invalid user ID:', idValidation.message);
+            return res.status(400).send(`Invalid request: ${idValidation.message}`);
+        }
 
-        // Create the data object for updating
-        const userData = {
-            profile_id: id || userId,  // Use param ID or form ID
+        // Prepare data for validation
+        const inputData = {
+            profile_id: idValidation.value,
             full_name: name,
             address: address,
             phone_number: phone,
             hobbies: hobbies,
-            birthday: new Date(birthdate),  // Ensure proper date format
-            gender: gender.trim()  // Trim any whitespace
+            birthday: birthdate,
+            gender: gender
         };
 
-        // Log the prepared data
-        // console.log('Data being sent to update service:', userData);
+        // Validate all input data
+        const validation = validateUserProfileData(inputData);
+        if (!validation.success) {
+            console.error('Validation error:', validation.message);
+            return res.status(400).send(`Invalid input: ${validation.message}`);
+        }
 
-        // Call the update service
+        // Use validated and sanitized data
+        const userData = validation.data;
+
+        console.log('Validated data being sent to update service:', userData);
+
+        // Call the update service with validated data
         const result = await updateUserInDB(userData);
 
-        // Log the result
         console.log('Update completed:', result);
 
         // Redirect back to the user list
@@ -70,30 +90,34 @@ const postLogin = async (req, res) => {
     try {
         const { username, password } = req.body;
 
-        // Validate input
-        if (!username || !password) {
-            return res.render('loginPage', { errorMessage: 'Username and password are required' });
+        // Validate login credentials
+        const validation = validateLoginData({ username, password });
+        if (!validation.success) {
+            console.log('Login validation failed:', validation.message);
+            return res.render('loginPage', { errorMessage: validation.message });
         }
 
-        // Basic input sanitization
-        const sanitizedUsername = username.trim();
-        const sanitizedPassword = password.trim();
+        // Use validated credentials
+        const { username: validUsername, password: validPassword } = validation.data;
+
+        console.log('Attempting login with validated credentials');
 
         // Check credentials and get JWT token
-        const result = await authenticateUser(sanitizedUsername, sanitizedPassword);
+        const result = await authenticateUser(validUsername, validPassword);
 
         if (result.success) {
             // Set JWT token in cookie
             res.cookie('auth_token', result.token, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === 'production', // Set to true in production
+                secure: process.env.NODE_ENV === 'production',
                 maxAge: 3600000 // 1 hour
             });
 
-            // Redirect to home page or dashboard
+            console.log('Login successful for user:', validUsername);
             return res.redirect('/');
         } else {
             // Authentication failed
+            console.log('Authentication failed:', result.message);
             return res.render('loginPage', { errorMessage: result.message });
         }
     } catch (error) {
@@ -113,19 +137,25 @@ const getUserProfilePage = async (req, res) => {
             return res.redirect('/login');
         }
 
+        // Validate user ID
+        const validation = validateUserId(userId);
+        if (!validation.success) {
+            console.error('Invalid user ID in token:', validation.message);
+            return res.redirect('/login');
+        }
+
         // Fetch complete user data from the database
         try {
-            const userData = await getUserByIdInDB(userId);
+            const userData = await getUserByIdInDB(validation.value);
 
             if (!userData || userData.length === 0) {
                 console.log('No user profile found for ID:', userId);
-                // Temporarily just show a basic profile with minimal info
                 return res.render('profilePage', {
                     user: {
                         name: res.locals.username || 'User',
                         role: res.locals.userRole || 'user',
                         email: res.locals.email || '',
-                        avatarUrl: '/uploads/default_profile.webp' // Default avatar
+                        avatarUrl: '/uploads/default_profile.webp'
                     },
                     req: req
                 });
@@ -134,25 +164,23 @@ const getUserProfilePage = async (req, res) => {
             // Format the user data for the template
             const user = {
                 id: userId,
-                name: userData[0][2] || res.locals.username || 'User', // full_name
+                name: userData[0][2] || res.locals.username || 'User',
                 role: res.locals.userRole || 'user',
                 email: res.locals.email || '',
-                phone: userData[0][4] || '', // phone_number
-                address: userData[0][3] || '', // address
-                hobbies: userData[0][5] || '', // hobbies
-                gender: userData[0][8] || 'Not specified', // gender
-                birthdate: userData[0][6] ? new Date(userData[0][6]).toLocaleDateString() : 'Not specified', // birthday
-                joinDate: userData[0][7] ? new Date(userData[0][7]).toLocaleDateString() : 'Not available', // created_at
-                avatarUrl: userData[0][9] || '/uploads/default_profile.webp' // avatar_url or default
+                phone: userData[0][4] || '',
+                address: userData[0][3] || '',
+                hobbies: userData[0][5] || '',
+                gender: userData[0][8] || 'Not specified',
+                birthdate: userData[0][6] ? new Date(userData[0][6]).toLocaleDateString() : 'Not specified',
+                joinDate: userData[0][7] ? new Date(userData[0][7]).toLocaleDateString() : 'Not available',
+                avatarUrl: userData[0][9] || '/uploads/default_profile.webp'
             };
 
             console.log('Prepared user data for profile:', user);
 
-            // Pass the updated user object to the template
             res.render('profilePage', { user, req });
         } catch (dbError) {
             console.error('Database error when fetching user profile:', dbError);
-            // Fallback to basic profile
             res.render('profilePage', {
                 user: {
                     name: res.locals.username || 'User',
@@ -170,11 +198,26 @@ const getUserProfilePage = async (req, res) => {
 // Update profile update handler to handle file uploads
 const updateUserProfile = async (req, res) => {
     try {
-        const userId = req.user.userId; // Get from the token/session
+        const userId = req.user.userId;
         const { name, phone, address, hobbies, birthdate, gender } = req.body;
 
         console.log('Updating profile for user:', userId);
-        console.log('Profile update data:', { name, phone, address, hobbies, birthdate, gender });
+
+        // Validate user ID
+        const userIdValidation = validateUserId(userId);
+        if (!userIdValidation.success) {
+            console.error('Invalid user ID:', userIdValidation.message);
+            return res.redirect('/user/profile?error=true');
+        }
+
+        // Validate file upload if present
+        if (req.file) {
+            const fileValidation = validateFileUpload(req.file, 'avatar');
+            if (!fileValidation.success) {
+                console.error('File validation failed:', fileValidation.message);
+                return res.redirect('/user/profile?error=true&message=' + encodeURIComponent(fileValidation.message));
+            }
+        }
 
         // If there was an error with file upload, redirect with error message
         if (req.fileUploadError) {
@@ -182,24 +225,35 @@ const updateUserProfile = async (req, res) => {
             return res.redirect('/user/profile?error=true&message=' + encodeURIComponent(req.fileUploadError));
         }
 
-        // Update the fields that the user is allowed to change
-        const userData = {
-            profile_id: userId,  // This is actually the user_id from JWT
+        // Prepare data for validation
+        const inputData = {
+            profile_id: userIdValidation.value,
             full_name: name,
             phone_number: phone,
             address: address,
             hobbies: hobbies,
-            // Add new fields
-            birthday: birthdate ? new Date(birthdate) : undefined,
-            gender: gender || null
+            birthday: birthdate,
+            gender: gender
         };
 
         // Add avatar URL if a file was uploaded
         if (req.filePath) {
-            userData.avatar_url = req.filePath;
+            inputData.avatar_url = req.filePath;
         }
 
-        await updateUserInDB(userData);
+        // Validate all profile data
+        const validation = validateUserProfileData(inputData);
+        if (!validation.success) {
+            console.error('Profile validation failed:', validation.message);
+            return res.redirect('/user/profile?error=true&message=' + encodeURIComponent(validation.message));
+        }
+
+        console.log('Profile update data validated:', validation.data);
+
+        // Update with validated data
+        await updateUserInDB(validation.data);
+
+        console.log('Profile update successful for user:', userId);
 
         // Redirect back to the profile page with a success message
         res.redirect('/user/profile?updated=true');
@@ -212,8 +266,6 @@ const updateUserProfile = async (req, res) => {
 // Update the middleware function to use the new path format
 const handleAvatarUpload = (req, res, next) => {
     uploadAvatar(req, res, (err) => {
-        // ...existing code...
-
         // File upload was successful
         if (req.file) {
             // Update path to reference src/public/uploads
@@ -221,8 +273,37 @@ const handleAvatarUpload = (req, res, next) => {
             console.log(`File uploaded successfully: ${req.filePath}`);
         }
 
-        // ...existing code...
+        next();
     });
+};
+
+// Meme upload page handler
+const getUploadMemePage = async (req, res) => {
+    res.render('uploadMemePage');
+};
+
+// Process meme upload - VULNERABLE
+const uploadMeme = async (req, res) => {
+    try {
+        // Check if file was uploaded
+        if (!req.file) {
+            return res.status(400).render('uploadMemePage', { error: 'No file uploaded' });
+        }
+
+        // VULNERABILITY: No server-side validation of file type beyond mimetype
+        // VULNERABILITY: No sanitization of filename
+
+        // Get the uploaded file path
+        const filePath = req.filePath;
+
+        console.log('Meme uploaded to:', filePath);
+
+        // Return success with the file path
+        return res.render('uploadMemePage', { success: true, filePath });
+    } catch (error) {
+        console.error('Meme upload error:', error);
+        return res.status(500).render('uploadMemePage', { error: 'Server error during upload' });
+    }
 };
 
 module.exports = {
@@ -230,10 +311,13 @@ module.exports = {
     getAboutPage,
     getListUserPage,
     postEditUserById,
+    handleAvatarUpload,
+    getUploadMemePage,
     getAddUserPage,
     getLoginPage,
     postLogin,
     logout,
     getUserProfilePage,
-    updateUserProfile  // Export the new function
+    updateUserProfile,
+    uploadMeme
 };
