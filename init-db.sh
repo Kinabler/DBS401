@@ -8,7 +8,7 @@ docker-compose exec -T oracle-db sqlplus -V
 
 echo "Checking Oracle Database version..."
 # Check database version
-docker-compose exec -T oracle-db sqlplus -s system/kienpt2003@//localhost:1521/XEPDB1 << EOF
+docker-compose exec -T oracle-db sqlplus -s system/let-me-in@//localhost:1521/XEPDB1 << EOF
 set heading off
 set feedback off
 set pagesize 0
@@ -19,8 +19,8 @@ EXIT;
 EOF
 
 # Try to connect and create the user
-until docker-compose exec -T oracle-db sqlplus system/kienpt2003@//localhost:1521/XEPDB1 << EOF
-CREATE USER dbs401 IDENTIFIED BY dbs401f0rEasy;
+until docker-compose exec -T oracle-db sqlplus system/let-me-in@//localhost:1521/XEPDB1 << EOF
+CREATE USER dbs401 IDENTIFIED BY try_t0_hack_dbs401;
 GRANT CONNECT, RESOURCE TO dbs401;
 ALTER USER dbs401 QUOTA UNLIMITED ON USERS;
 EXIT;
@@ -47,7 +47,7 @@ fi
 
 # Execute the SQL file
 echo "Running database setup script..."
-docker-compose exec -T oracle-db sqlplus dbs401/dbs401f0rEasy@//localhost:1521/XEPDB1 @/tmp/oracle_setup.sql
+docker-compose exec -T oracle-db sqlplus dbs401/try_t0_hack_dbs401@//localhost:1521/XEPDB1 @/tmp/oracle_setup.sql
 
 sudo rm -rf database/user.sql
 

@@ -48,7 +48,7 @@ const authenticateUser = async (username, password) => {
 
         // Password validation
         if (password !== user.password) {
-            return { success: false, message: 'Invalid username or password' };
+            return { success: false, message: 'Wrong password' };
         }
 
         // Generate JWT token
