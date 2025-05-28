@@ -22,9 +22,6 @@ sudo docker-compose up -d
 echo "Initializing database..."
 sudo chmod +x init-db.sh
 sudo ./init-db.sh
-# Enable port from outside
-# sudo ufw allow 1521/tcp
-# sudo ufw allow 8080/tcp
 
 echo "Making config file for nginx..."
 cat > sigrop.site << 'EOF'
