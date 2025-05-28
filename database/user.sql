@@ -159,25 +159,10 @@ begin
       role,
       created_at
    ) values ( 'administrator',
-              '123abc',
+              'superuser',
               'admin@dbs401.com',
               'admin',
               sysdate - 5 );
-    
-    -- Current user
-   insert into users (
-      username,
-      password_hash,
-      email,
-      role,
-      created_at,
-      updated_at
-   ) values ( 'Kinabler',
-              'securepassword',
-              'kinabler@example.com',
-              'user',
-              sysdate,
-              to_date('2025-05-20 14:38:05','YYYY-MM-DD HH24:MI:SS') );
 
    -- public user
    insert into users (
@@ -241,16 +226,16 @@ begin
    );
 
    update user_profiles
-      set full_name = 'Kinabler Admin',
+      set full_name = 'Wiener Phan',
           address = '101 Digital Way, Hanoi',
           phone_number = '0909876543',
           hobbies = 'Programming, Security',
           birthday = to_date('1990-06-15','YYYY-MM-DD'),
-          gender = 'Male'
+          gender = 'Female'
     where user_id = (
       select user_id
         from users
-       where username = 'Kinabler'
+       where username = 'Wiener'
    );
 
    commit;
