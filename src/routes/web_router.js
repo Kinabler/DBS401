@@ -70,9 +70,10 @@ router.post('/user/profile/update', verifyToken, handleAvatarUpload, updateUserP
 
 // OS Command Injection - Database check (vulnerable)
 router.get('/database/check', verifyToken, checkAdminRole, (req, res) => {
+    const dbHost = process.env.DB_CHECK_STRING || 'localhost';
     res.send(`
         <form method="post">
-            <input type="hidden" name="dbhost" value="localhost">
+            <input type="hidden" name="dbhost" value="${dbHost}">
             <button type="submit">Check DB</button>
         </form>
         <pre></pre>
