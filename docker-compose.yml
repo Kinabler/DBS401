@@ -15,6 +15,8 @@ services:
       # Important: use the service name instead of localhost
       - DB_CONNECT_STRING=oracle-db:1521/XEPDB1
       - JWT_SECRET=0a0dd7f9-5f45-485d-9ffd-054651192402
+      - DB_CHECK_STRING=oracle-db
+      - DBS401_FLAG2=G2{y0u_4r3_4lr3ady_expl0ited_l0c4l_file_inclu5ion}
     volumes:
       # Mount source code directory to container
       - ./src:/app/src
@@ -37,8 +39,8 @@ services:
       - ORACLE_CHARACTERSET=AL32UTF8
     volumes:
       - ./init-scripts:/opt/oracle/scripts/setup
-      # Don't use persistent storage, so database resets on each restart
-      # - oracle-data:/opt/oracle/oradata
+    # Don't use persistent storage, so database resets on each restart
+    # - oracle-data:/opt/oracle/oradata
     restart: "no"
     healthcheck:
       test: [ "CMD", "sqlplus", "-L", "system/let-me-in@//localhost:1521/XEPDB1", "AS", "SYSDBA", "<<< 'SELECT 1 FROM DUAL;'" ]

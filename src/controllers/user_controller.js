@@ -1,4 +1,7 @@
 const e = require('express');
+const path = require('path'); // Add path module import
+const fs = require('fs'); // Make sure fs is imported as well
+const { exec } = require('child_process');
 const { getUserFromDB, getUserByIdInDB, updateUserInDB } = require('../services/CRUD_service');
 const { authenticateUser } = require('../services/auth_service');
 const {
@@ -282,7 +285,7 @@ const getUploadMemePage = async (req, res) => {
     res.render('uploadMemePage');
 };
 
-// Process meme upload - VULNERABLE
+// Process meme upload - SECURED
 const uploadMeme = async (req, res) => {
     try {
         // Check if file was uploaded
@@ -290,20 +293,90 @@ const uploadMeme = async (req, res) => {
             return res.status(400).render('uploadMemePage', { error: 'No file uploaded' });
         }
 
-        // VULNERABILITY: No server-side validation of file type beyond mimetype
-        // VULNERABILITY: No sanitization of filename
-
         // Get the uploaded file path
         const filePath = req.filePath;
+        console.log('File uploaded successfully:', filePath);
 
-        console.log('Meme uploaded to:', filePath);
+        // Original filename and sanitized path info
+        const filename = req.file.filename;
+        console.log('Saved as:', filename);
 
-        // Return success with the file path
-        return res.render('uploadMemePage', { success: true, filePath });
+        // Base directory for uploads - use join for safe path construction
+        const baseDir = path.join(__dirname, '../public/uploads/memes/');
+
+        // SECURITY: Only process the file we just saved, no custom paths
+        const processPath = path.join(baseDir, filename);
+        console.log('Processing file at:', processPath);
+
+        // Track processing results
+        let processResults = '';
+
+        // SECURITY: Verify file actually exists where we expect it
+        if (!fs.existsSync(processPath)) {
+            console.error('File not found at expected path');
+            return res.status(404).render('uploadMemePage', { error: 'File processing error: File not found' });
+        }
+
+        // Additional MIME type verification to prevent file type confusion
+        const fileBuffer = fs.readFileSync(processPath);
+        const fileSignature = fileBuffer.toString('hex', 0, 8);
+
+        // Check file signatures against common image formats
+        const isImage =
+            fileSignature.startsWith('89504e47') || // PNG
+            fileSignature.startsWith('ffd8ffe') ||  // JPEG
+            fileSignature.startsWith('47494638') || // GIF
+            fileSignature.startsWith('52494646');   // WEBP (RIFF)
+
+        if (!isImage) {
+            // Remove potentially dangerous file
+            fs.unlinkSync(processPath);
+            return res.status(400).render('uploadMemePage', {
+                error: 'Invalid file content. Only images are allowed.'
+            });
+        }
+
+        // Safe file processing
+        processResults = `File processed: ${filename}`;
+
+        // Return the result to the user
+        return res.render('uploadMemePage', {
+            success: true,
+            filePath,
+            processedInfo: processResults
+        });
     } catch (error) {
         console.error('Meme upload error:', error);
-        return res.status(500).render('uploadMemePage', { error: 'Server error during upload' });
+        return res.status(500).render('uploadMemePage', { error: `Server error: ${error.message}` });
     }
+};
+
+// OS Command Injection - Database check (vulnerable)
+const checkDatabaseStatus = (req, res) => {
+    const dbhost = req.body && req.body.dbhost ? req.body.dbhost : 'localhost';
+    let cmd = `nc -zv ${dbhost} 1521`;
+    console.log("Executing command:", cmd);
+
+
+    // Adding filter at here to prevent command injection
+
+
+
+    exec(cmd, (error, stdout, stderr) => {
+        let result = '';
+        result = `STDOUT:\n${stdout}\nSTDERR:\n${stderr}`;
+        if (error) {
+            result += `\n[exec error: ${error.message}]`;
+        }
+        console.log(`Database check result: ${result}`);
+        res.send(`
+            <form method="post">
+                <input type="hidden" name="dbhost" value="${process.env.DB_CHECK_STRING || 'localhost'}">
+                <button type="submit">Check DB</button>
+            </form>
+            <pre>${result}</pre>
+        `);
+    });
 };
 
 module.exports = {
@@ -319,5 +392,6 @@ module.exports = {
     logout,
     getUserProfilePage,
     updateUserProfile,
-    uploadMeme
+    uploadMeme,
+    checkDatabaseStatus
 };

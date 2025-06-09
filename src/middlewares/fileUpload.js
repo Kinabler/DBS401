@@ -83,10 +83,9 @@ const handleAvatarUpload = (req, res, next) => {
     });
 };
 
-// Define storage configuration for meme uploads - VULNERABLE
+// Define storage configuration for meme uploads - SECURED
 const memeStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-        // VULNERABILITY: Storing in a web-accessible directory
         const memesDir = path.join(__dirname, '../public/uploads/memes');
 
         // Create directory if it doesn't exist
@@ -97,21 +96,36 @@ const memeStorage = multer.diskStorage({
         cb(null, memesDir);
     },
     filename: (req, file, cb) => {
-        // VULNERABILITY: Preserving the original file extension
+        // SECURITY: Properly sanitize the filename to prevent path traversal
         const originalName = file.originalname;
-        // VULNERABILITY: Minimal renaming that preserves malicious extensions
-        const newFilename = `meme_${Date.now()}_${originalName}`;
+        // Use path.basename to strip any path components
+        const safeBaseName = path.basename(originalName);
+        // Extract extension safely
+        const extension = path.extname(safeBaseName);
+        // Only keep alphanumeric characters plus some safe ones in the base name
+        const sanitizedName = path.basename(safeBaseName, extension)
+            .replace(/[^a-zA-Z0-9_-]/g, '_');
+
+        // Create a safe filename
+        const newFilename = `meme_${Date.now()}_${sanitizedName}${extension}`;
+        console.log("Creating sanitized filename:", newFilename);
         cb(null, newFilename);
     }
 });
 
-// VULNERABLE file filter - only checking mime type but not extension
+// Improved file filter - checking both mime type and extension
 const memeFileFilter = (req, file, cb) => {
-    // VULNERABILITY: Only checking content type which can be spoofed
-    if (file.mimetype.startsWith('image/')) {
+    // Check file extension
+    const ext = path.extname(file.originalname).toLowerCase();
+    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+
+    // Check MIME type
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+
+    if (allowedExtensions.includes(ext) && allowedMimeTypes.includes(file.mimetype)) {
         cb(null, true);
     } else {
-        cb(new Error('Only image files are allowed for memes'), false);
+        cb(new Error('Only image files (JPG, PNG, GIF, WEBP) are allowed'), false);
     }
 };
 

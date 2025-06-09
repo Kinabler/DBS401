@@ -100,13 +100,9 @@ const updateUserInDB = async (data) => {
     const { profile_id, full_name, address, phone_number, hobbies, birthday, gender, avatar_url } = data;
     let connection;
     try {
-        // Create a connection pool
         const pool = await createPool();
-
-        // Get a connection from the pool
         connection = await pool.getConnection();
 
-        // Log the data being sent to the database for debugging
         console.log('Updating user with data:', {
             user_id: profile_id,
             full_name,
@@ -118,49 +114,53 @@ const updateUserInDB = async (data) => {
             avatar_url
         });
 
-        // VULNERABLE CODE: Using string concatenation instead of parameterized queries
-        // This creates an SQL injection vulnerability when updating the gender field
+        // Xây dựng câu truy vấn an toàn với prepared statements
         let query = `UPDATE user_profiles 
             SET full_name = :full_name, 
                 address = :address, 
                 phone_number = :phone_number, 
                 hobbies = :hobbies`;
 
-        // Make the birthday conditional but safe
+        // Xây dựng đối tượng bind parameters
+        let bindParams = {
+            full_name,
+            address,
+            phone_number,
+            hobbies,
+            user_id: profile_id
+        };
+
+        // Thêm birthday nếu có - sử dụng bind parameter an toàn
         if (birthday) {
             query += `, birthday = :birthday`;
+            bindParams.birthday = birthday;
         }
 
-        // VULNERABLE: Direct string concatenation for gender
+        // ĐÃ SỬA: Sử dụng bind parameter thay vì nối chuỗi trực tiếp
         if (gender) {
-            query += `, gender = '${gender}'`; // SQL Injection vulnerability here!
+            query += `, gender = :gender`;
+            bindParams.gender = gender;
         }
 
-        // Safe parameterized part for avatar_url
+        // Thêm avatar_url nếu có - sử dụng bind parameter an toàn
         if (avatar_url) {
             query += ', avatar_url = :avatar_url';
+            bindParams.avatar_url = avatar_url;
         }
 
         query += ' WHERE user_id = :user_id';
 
-        // Execute the vulnerable query
+        console.log('Executing secure query:', query);
+        console.log('Bind parameters:', bindParams);
+
+        // Execute the secure query với prepared statements
         const result = await connection.execute(
             query,
-            {
-                full_name,
-                address,
-                phone_number,
-                hobbies,
-                ...(birthday && { birthday }),
-                ...(avatar_url && { avatar_url }),
-                user_id: profile_id
-            },
+            bindParams,
             { autoCommit: true }
         );
 
         console.log('Update result:', result);
-
-        // Return the result
         return result;
     } catch (err) {
         console.error('Error updating user:', err);

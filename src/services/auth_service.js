@@ -22,13 +22,15 @@ const authenticateUser = async (username, password) => {
             'SELECT TO_CHAR(USER_ID) as USER_ID, USERNAME, PASSWORD_HASH, EMAIL, ROLE, CREATED_AT, UPDATED_AT FROM users WHERE username = :username',
             { username }
         );
-        console.log(">> Checking user Id:", result.rows[0][0]);
-        console.log(">> Query result:", result.rows[0]);
 
-        // Check if user exists - fix the logic error
+        // Check if user exists FIRST before accessing results
         if (!result.rows || result.rows.length === 0) {
             return { success: false, message: 'Invalid username or password' };
         }
+
+        // Now it's safe to log and access the results
+        console.log(">> Checking user Id:", result.rows[0][0]);
+        console.log(">> Query result:", result.rows[0]);
 
         // Extract user data
         const user = {
@@ -46,7 +48,7 @@ const authenticateUser = async (username, password) => {
             return { success: false, message: 'Invalid username or password' };
         } else {
             // sleep 1 second 
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            await new Promise(resolve => setTimeout(resolve, 1000));
             // Password validation
             if (user.password !== password) {
                 return { success: false, message: 'Invalid username or password' };

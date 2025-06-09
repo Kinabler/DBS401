@@ -7,6 +7,7 @@ const cookieParser = require('cookie-parser'); // Add cookie-parser require
 const configViewEngine = require('./configs/viewEngine');
 const webRoute = require('./routes/web_router');
 const ensureDirectories = require('./middlewares/ensureDirectories');
+const secureStaticFiles = require('./middlewares/secureStaticFiles');
 
 // Ensure all required directories exist
 ensureDirectories();
@@ -20,7 +21,10 @@ const port = process.env.PORT || 8081;
 // Config view engine
 configViewEngine(app, express);
 
-// Serve static files from both locations
+// Apply secure static files middleware before serving static files
+app.use(secureStaticFiles);
+
+// VULNERABILITY: Don't use path.join for static files to allow path traversal
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(express.static(path.join(__dirname, 'public'))); // Add this line to serve from src/public
 
