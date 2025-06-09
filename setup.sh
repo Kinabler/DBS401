@@ -29,16 +29,29 @@ server {
     listen 80;
     server_name sigrop.site www.sigrop.site;
 
+    # Tối ưu cho các challenge CTF cần nhận path lạ, LFI, bypass, v.v.
+    ignore_invalid_headers off;
+    client_max_body_size 50M;
+
+    access_log /var/log/nginx/access.log;
+    error_log /var/log/nginx/error.log debug;
+
     location / {
         proxy_pass http://127.0.0.1:8080;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
+        proxy_set_header Connection $http_connection;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_cache_bypass $http_upgrade;
+
+        # Không dùng try_files để tránh nginx kiểm tra file local
+        # Không dùng rewrite hoặc rule chặn path
+
+        # Cho phép path đặc biệt, không encode lại uri
+        proxy_pass_request_headers on;
     }
 }
 EOF
