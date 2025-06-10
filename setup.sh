@@ -76,6 +76,7 @@ sudo ln -sf /etc/nginx/sites-available/sigrop.site /etc/nginx/sites-enabled/
 
 # delete default config for non-conflict
 sudo rm -f /etc/nginx/sites-enabled/default
+sudo rm -rf /etc/nginx/sites-available/default
 
 echo "Checking nginx configuration... "
 sudo nginx -t
