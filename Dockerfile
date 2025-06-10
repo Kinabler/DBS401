@@ -17,19 +17,15 @@ RUN groupadd -r www-data || true && \
 
 # Copy package.json and package-lock.json
 COPY --chown=www-data:www-data package*.json ./
+
+# Install dependencies
+RUN npm ci --production
+
 # Copy the rest of the application
-COPY --chown=www-data:www-data ./src ./src
+COPY --chown=www-data:www-data . .
 
 # Switch to the www-data user
 USER www-data
-
-# Configure npm to use a custom cache directory within /app
-# This prevents npm from trying to write to /var/www
-RUN mkdir -p /app/.npm-cache && \
-    npm config set cache /app/.npm-cache --global
-
-# Install dependencies as www-data
-RUN npm install
 
 # Expose the port the app will run on
 EXPOSE 8080
