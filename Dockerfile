@@ -19,12 +19,12 @@ RUN npm ci --omit=dev
 COPY . .
 
 # Create all necessary directories and set proper permissions
-RUN mkdir -p /app/public/uploads/memes \
-    /app/public/uploads/profiles \
-    /app/src/public/uploads/memes \
-    /app/src/public/uploads/profiles && \
+RUN mkdir -p /app/src/public/uploads/memes \
+    /app/src/public/uploads/profiles \
+    /app/public/uploads/memes \
+    /app/public/uploads/profiles && \
     chown -R www-data:www-data /app && \
-    chmod -R 755 /app
+    chmod -R 755 /app/src/public/uploads
 
 # Switch to the www-data user
 USER www-data
