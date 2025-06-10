@@ -1,6 +1,6 @@
 #!/bin/bash
 echo "Waiting for Oracle Database to be ready..."
-sleep 30  # Increase initial wait time
+sleep 60  # Increase initial wait time
 
 echo "Checking if Oracle container is running..."
 docker-compose ps oracle-db
