@@ -1,33 +1,21 @@
 # Use an official Node.js runtime as the base image
-FROM node:22-slim
+FROM node:22-alpine
 
 # Set the working directory in the container
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update -y && \
-    apt-get install -y apt-utils && \
-    apt-get upgrade -y
-
-# Copy package.json and package-lock.json first
+# Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Install dependencies as root
-RUN npm ci --omit=dev
+# Install dependencies
+RUN npm install
 
-# Copy the rest of the application
+# Copy only necessary files (src and public will be mounted as volumes)
 COPY . .
 
-# Create all necessary directories and set proper permissions
-RUN mkdir -p /app/src/public/uploads/memes \
-    /app/src/public/uploads/profiles \
-    /app/public/uploads/memes \
-    /app/public/uploads/profiles && \
-    chown -R www-data:www-data /app && \
-    chmod -R 755 /app/src/public/uploads
-
-# Switch to the www-data user
-USER www-data
+# Make the uploads directory writable
+RUN mkdir -p /app/public/uploads/memes /app/public/uploads/profiles
+RUN chmod -R 777 /app/public/uploads
 
 # Expose the port the app will run on
 EXPOSE 8080

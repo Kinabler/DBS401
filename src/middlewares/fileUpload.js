@@ -2,55 +2,29 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-// Ensure upload directories exist with proper error handling
+// Ensure upload directories exist
 const createUploadDirs = () => {
-    try {
-        // Use absolute paths that match with Docker setup
-        const uploadDir = path.join(__dirname, '../public/uploads');
-        const profileDir = path.join(uploadDir, 'profiles');
-        const memesDir = path.join(uploadDir, 'memes');
+    // Change from '../../public/uploads' to '../public/uploads' to store in src/public/uploads
+    const uploadDir = path.join(__dirname, '../public/uploads');
+    const profileDir = path.join(uploadDir, 'profiles');
 
-        // Create directories with proper permissions
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true, mode: 0o755 });
-        }
-
-        if (!fs.existsSync(profileDir)) {
-            fs.mkdirSync(profileDir, { recursive: true, mode: 0o755 });
-        }
-
-        if (!fs.existsSync(memesDir)) {
-            fs.mkdirSync(memesDir, { recursive: true, mode: 0o755 });
-        }
-
-        console.log('Upload directories created successfully');
-        return { uploadDir, profileDir, memesDir };
-    } catch (error) {
-        console.error('Error creating upload directories:', error);
-        // If directory creation fails, try to use existing directories
-        const uploadDir = path.join(__dirname, '../public/uploads');
-        const profileDir = path.join(uploadDir, 'profiles');
-        const memesDir = path.join(uploadDir, 'memes');
-
-        return { uploadDir, profileDir, memesDir };
+    if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
     }
+
+    if (!fs.existsSync(profileDir)) {
+        fs.mkdirSync(profileDir, { recursive: true });
+    }
+
+    return { uploadDir, profileDir };
 };
 
-// Initialize directories
-const { profileDir, memesDir } = createUploadDirs();
+// Configure storage options
+const { profileDir } = createUploadDirs();
 
 // Define storage configuration for profile uploads
 const profileStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-        // Double-check directory exists before using it
-        if (!fs.existsSync(profileDir)) {
-            try {
-                fs.mkdirSync(profileDir, { recursive: true, mode: 0o755 });
-            } catch (error) {
-                console.error('Failed to create profile directory:', error);
-                return cb(error);
-            }
-        }
         cb(null, profileDir);
     },
     filename: (req, file, cb) => {
@@ -112,15 +86,13 @@ const handleAvatarUpload = (req, res, next) => {
 // Define storage configuration for meme uploads - SECURED
 const memeStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-        // Double-check directory exists before using it
+        const memesDir = path.join(__dirname, '../public/uploads/memes');
+
+        // Create directory if it doesn't exist
         if (!fs.existsSync(memesDir)) {
-            try {
-                fs.mkdirSync(memesDir, { recursive: true, mode: 0o755 });
-            } catch (error) {
-                console.error('Failed to create memes directory:', error);
-                return cb(error);
-            }
+            fs.mkdirSync(memesDir, { recursive: true });
         }
+
         cb(null, memesDir);
     },
     filename: (req, file, cb) => {
@@ -157,7 +129,7 @@ const memeFileFilter = (req, file, cb) => {
     }
 };
 
-// Create the meme uploader
+// Create the vulnerable meme uploader
 const uploadMeme = multer({
     storage: memeStorage,
     fileFilter: memeFileFilter,
@@ -168,6 +140,7 @@ const uploadMeme = multer({
 
 // Create middleware that can be used in routes
 const handleMemeUpload = (req, res, next) => {
+    // VULNERABILITY: No additional security checks
     uploadMeme(req, res, (err) => {
         if (err instanceof multer.MulterError) {
             console.error('Multer upload error:', err);
@@ -181,6 +154,7 @@ const handleMemeUpload = (req, res, next) => {
 
         // File upload was successful
         if (req.file) {
+            // VULNERABILITY: Creating a web-accessible path
             req.filePath = `/uploads/memes/${req.file.filename}`;
             console.log(`Meme uploaded: ${req.filePath}`);
         }
@@ -189,7 +163,7 @@ const handleMemeUpload = (req, res, next) => {
     });
 };
 
-// Export the handlers
+// Export the vulnerable handler
 module.exports = {
     handleAvatarUpload,
     handleMemeUpload
