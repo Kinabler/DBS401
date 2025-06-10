@@ -52,36 +52,13 @@ sudo ufw allow 1521/tcp
 # Config apache
 sudo apt update
 sudo apt install apache2 -y
-sudo a2enmod proxy proxy_http
+sudo a2enmod proxy proxy_http headers
 
 # Configure virtual host for sigrop.site
-sudo tee /etc/apache2/sites-available/sigrop-site.conf > /dev/null <<EOL
-<VirtualHost *:80>
-    ServerName sigrop.site
-    ServerAlias www.sigrop.site
-
-    ProxyPreserveHost On
-    
-    ProxyPass / http://localhost:8080/ retry=0
-    ProxyPassReverse / http://localhost:8080/
-    
-    AllowEncodedSlashes On
-    
-    LimitRequestFieldSize 32768
-    LimitRequestLine 32768
-
-    # Bỏ dòng AllowDotInPath On vì không tồn tại
-    
-    ErrorLog ${APACHE_LOG_DIR}/sigrop-error.log
-    CustomLog ${APACHE_LOG_DIR}/sigrop-access.log combined
-    
-    # Thêm các directive bảo mật (tùy chọn)
-    ProxyTimeout 300
-    ProxyBadHeader Ignore
-</VirtualHost>
-EOL
+sudo cp sigrop-site.conf /etc/apache2/sites-available/
 
 sudo a2ensite sigrop-site.conf
+sudo a2dissite 000-default.conf
 sudo systemctl reload apache2
 
 # Add domain to /etc/hosts for local testing
@@ -91,3 +68,8 @@ fi
 
 sudo systemctl restart apache2
 sudo ufw allow 80/tcp
+
+echo "=== CTF Setup Complete ==="
+echo "Access the application at: http://sigrop.site"
+echo "Admin credentials: administrator / superuser"
+echo "Test path traversal: http://sigrop.site/uploads/memes%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2Fproc%2Fself%2Fenviron"
