@@ -11,9 +11,10 @@ COPY package*.json ./
 RUN npm install
 
 # Create www-data user and group for running the application
-# Using numeric IDs for better compatibility across systems
-RUN addgroup -g 82 www-data && \
-    adduser -u 82 -G www-data -s /bin/sh -D www-data
+# Use the -S flag for addgroup which will handle existing groups better
+# Use || true to prevent build failure if group/user already exists
+RUN grep -q "^www-data:" /etc/group || addgroup -S www-data && \
+    grep -q "^www-data:" /etc/passwd || adduser -S -G www-data -s /bin/sh www-data
 
 # Copy only necessary files (src and public will be mounted as volumes)
 COPY . .
