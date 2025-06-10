@@ -31,15 +31,30 @@ EOF
 
 echo "Database user creation attempted!"
 
-# Copy the SQL file to the container
-echo "Copying database script to container..."
-CONTAINER_ID=$(docker-compose ps -q oracle-db)
-docker cp database/user.sql $CONTAINER_ID:/tmp/oracle_setup.sql
+# Increase the maximum processes parameter
+echo "Increasing database process limit..."
+docker-compose exec -T oracle-db sqlplus -s / as sysdba << EOF
+ALTER SYSTEM SET processes=600 SCOPE=SPFILE;
+ALTER SYSTEM SET sessions=600 SCOPE=SPFILE;
+SHUTDOWN IMMEDIATE;
+STARTUP;
+EXIT;
+EOF
 
+# Give the database a moment to restart before proceeding
+sleep 30
+echo "Database restarted with increased process limit"
+
+# Check if the SQL file exists before copying
 if [ ! -f "database/user.sql" ]; then
   echo "Error: database/user.sql not found!"
   exit 1
 fi
+
+# Copy the SQL file to the container
+echo "Copying database script to container..."
+CONTAINER_ID=$(docker-compose ps -q oracle-db)
+docker cp database/user.sql $CONTAINER_ID:/tmp/oracle_setup.sql
 
 # Execute the SQL file with the appropriate connection
 echo "Running database setup script..."
