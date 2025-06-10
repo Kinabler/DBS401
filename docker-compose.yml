@@ -8,26 +8,24 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - HOST=0.0.0.0
-      - PORT=8080
-      - DB_PASSWORD=try_t0_hack_dbs401
-      - DB_USER=dbs401
-      # Important: use the service name instead of localhost
-      - DB_CONNECT_STRING=oracle-db:1521/XEPDB1
-      - JWT_SECRET=0a0dd7f9-5f45-485d-9ffd-054651192402
-      - DB_CHECK_STRING=oracle-db
-      - DBS401_FLAG2=G2{y0u_4r3_4lr3ady_expl0ited_l0c4l_file_inclu5ion}
+      # Sẽ báo lỗi nếu biến môi trường không được cung cấp
+      - HOST=${HOST:?HOST is not set}
+      - PORT=${PORT:?PORT is not set}
+      - DB_PASSWORD=${DB_PASSWORD:?DB_PASSWORD is not set}
+      - DB_USER=${DB_USER:?DB_USER is not set}
+      - DB_CONNECT_STRING=${DB_CONNECT_STRING:?DB_CONNECT_STRING is not set}
+      - JWT_SECRET=${JWT_SECRET:?JWT_SECRET is not set}
+      - DB_CHECK_STRING=${DB_CHECK_STRING:?DB_CHECK_STRING is not set}
+      - DBS401_FLAG2=${DBS401_FLAG2:?DBS401_FLAG2 is not set}
     volumes:
-      # Mount source code directory to container
       - ./src:/app/src
-      # Mount public assets
       - ./public:/app/public
+      - node_modules:/app/node_modules
     depends_on:
       oracle-db:
         condition: service_healthy
-    restart: "no"
-    command: >
-      sh -c "npm install && npm run start"
+    restart: unless-stopped
+    command: npm run start
 
   oracle-db:
     image: container-registry.oracle.com/database/express:21.3.0-xe
@@ -35,20 +33,18 @@ services:
       - "1521:1521"
       - "5500:5500"
     environment:
-      - ORACLE_PWD=let-me-in
+      - ORACLE_PWD=${ORACLE_ADMIN_PASSWORD:?ORACLE_ADMIN_PASSWORD is not set}
       - ORACLE_CHARACTERSET=AL32UTF8
     volumes:
       - ./init-scripts:/opt/oracle/scripts/setup
-    # Don't use persistent storage, so database resets on each restart
-    # - oracle-data:/opt/oracle/oradata
-    restart: "no"
+    restart: unless-stopped
     healthcheck:
-      test: [ "CMD", "sqlplus", "-L", "system/let-me-in@//localhost:1521/XEPDB1", "AS", "SYSDBA", "<<< 'SELECT 1 FROM DUAL;'" ]
+      test: [ "CMD", "sqlplus", "-L", "system/${ORACLE_ADMIN_PASSWORD}@//localhost:1521/XEPDB1", "AS", "SYSDBA", "<<< 'SELECT 1 FROM DUAL;'" ]
       interval: 10s
       timeout: 10s
       retries: 10
       start_period: 40s
 
 volumes:
-  # Keep this definition for compatibility even if we're not using it
+  node_modules:
   oracle-data:
