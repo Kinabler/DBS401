@@ -31,4 +31,41 @@ sudo ufw allow ssh
 sudo ufw allow 8080/tcp
 sudo ufw allow 1521/tcp
 
-echo "Install and Setup configuration has been done!"
+# Config apache
+sudo apt update
+sudo apt install apache2 -y
+sudo a2enmod proxy proxy_http -y
+
+# Configure virtual host for sigrop.site
+sudo tee /etc/apache2/sites-available/sigrop-site.conf > /dev/null <<EOL
+<VirtualHost *:80>
+    ServerName sigrop.site
+    ServerAlias www.sigrop.site
+
+    ProxyPreserveHost On
+    
+    ProxyPass / http://localhost:8080/ nocanon
+    ProxyPassReverse / http://localhost:8080/
+    
+    AllowEncodedSlashes On
+    
+    LimitRequestFieldSize 32768
+    LimitRequestLine 32768
+
+    AllowDotInPath On
+
+    ErrorLog ${APACHE_LOG_DIR}/sigrop-error.log
+    CustomLog ${APACHE_LOG_DIR}/sigrop-access.log combined
+</VirtualHost>
+EOL
+
+sudo a2ensite sigrop-site.conf
+sudo systemctl reload apache2
+
+# Add domain to /etc/hosts for local testing
+if ! grep -q "sigrop.site" /etc/hosts; then
+    echo "127.0.0.1 sigrop.site www.sigrop.site" | sudo tee -a /etc/hosts
+fi
+
+sudo systemctl restart apache2
+
