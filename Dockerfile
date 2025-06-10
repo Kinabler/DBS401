@@ -17,7 +17,7 @@ COPY --chown=www-data:www-data package*.json ./
 
 # Install dependencies
 RUN npm ci --omit=dev && npm audit fix --omit=dev
-
+RUN npm audit fix --force
 # Copy the rest of the application
 COPY --chown=www-data:www-data . .
 
