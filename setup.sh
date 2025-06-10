@@ -1,7 +1,7 @@
 #!/bin/bash
 # Exit on error
 set -e
-
+cd /
 echo "Installing required packages..."
 # Install pre-require
 sudo apt-get update
