@@ -15,6 +15,18 @@ sudo apt install certbot python3-certbot-nginx -y
 echo "Cloning repository..."
 git clone https://Kinabler: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@github.com/Kinabler/DBS401.git
 cd DBS401
+
+echo "Copying web source to /var/www/html..."
+sudo mkdir -p /var/www/html
+# Copy contents of the current directory (DBS401) to /var/www/html
+# Using rsync to avoid issues with copying '.' into a subdirectory of itself if /var/www/html is inside DBS401
+# However, assuming /var/www/html is a standard system path, cp -R . should be fine.
+# Adding a trailing slash to source ensures contents are copied, not the directory itself.
+sudo cp -R ./ /var/www/html/
+# Set ownership for Apache user, though Apache is not installed by this script
+sudo chown -R www-data:www-data /var/www/html || echo "Chown to www-data failed, perhaps user does not exist. This is okay if Apache is not the primary server."
+
+
 # Spawn all docker container
 echo "Starting Docker containers..."
 sudo docker-compose up -d
