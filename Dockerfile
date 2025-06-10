@@ -7,11 +7,8 @@ WORKDIR /app
 # Install system dependencies
 RUN apt-get update -y && apt-get upgrade -y
 
-# Ensure www-data user exists (should already exist in Debian-based images)
-# and create app directories with proper permissions
-RUN groupadd -r www-data || true && \
-    useradd -r -g www-data www-data || true && \
-    mkdir -p /app/public/uploads/memes /app/public/uploads/profiles && \
+# Create app directories with proper permissions
+RUN mkdir -p /app/public/uploads/memes /app/public/uploads/profiles && \
     chown -R www-data:www-data /app && \
     chmod -R 755 /app
 
@@ -19,7 +16,7 @@ RUN groupadd -r www-data || true && \
 COPY --chown=www-data:www-data package*.json ./
 
 # Install dependencies
-RUN npm ci --production
+RUN npm ci --omit=dev && npm audit fix --omit=dev
 
 # Copy the rest of the application
 COPY --chown=www-data:www-data . .
