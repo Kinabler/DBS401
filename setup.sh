@@ -36,8 +36,7 @@ echo "Cleaning up dangling images..."
 docker image prune -f
 
 echo "Cleanup completed!"
-sudo docker-compose build --no-cache
-sudo docker-compose up -d
+sudo docker-compose up -d --build
 # Initialize database
 echo "Initializing database..."
 sudo chmod +x init-db.sh
@@ -46,5 +45,6 @@ sudo ./init-db.sh
 # Add config file
 sudo ufw enable
 sudo ufw allow ssh
-sudo ufw allow 8080/tcp
-sudo ufw allow 1521/tcp
+sudo ufw allow http
+# sudo ufw allow 8080/tcp
+# sudo ufw allow 1521/tcp

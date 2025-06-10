@@ -1,3 +1,5 @@
 .env
 src/logs/access.log
 node_modules
+src/public/uploads/memes/*
+src/public/uploads/profiles/*
