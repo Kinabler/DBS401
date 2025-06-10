@@ -18,6 +18,50 @@ log_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
+# Function to check and open pluggable database
+check_and_open_pdb() {
+    log_info "Checking pluggable database status..."
+    
+    # Check if XEPDB1 is open
+    PDB_STATUS=$(docker-compose exec -T oracle-db sqlplus -s / as sysdba << EOF
+set heading off
+set feedback off
+set pagesize 0
+SELECT open_mode FROM v\$pdbs WHERE name = 'XEPDB1';
+EXIT;
+EOF
+    )
+    
+    if echo "$PDB_STATUS" | grep -q "READ WRITE"; then
+        log_info "Pluggable database XEPDB1 is already open"
+        return 0
+    else
+        log_info "Opening pluggable database XEPDB1..."
+        docker-compose exec -T oracle-db sqlplus -s / as sysdba << EOF
+ALTER PLUGGABLE DATABASE XEPDB1 OPEN;
+EXIT;
+EOF
+        
+        # Verify it's now open
+        PDB_STATUS_AFTER=$(docker-compose exec -T oracle-db sqlplus -s / as sysdba << EOF
+set heading off
+set feedback off
+set pagesize 0
+SELECT open_mode FROM v\$pdbs WHERE name = 'XEPDB1';
+EXIT;
+EOF
+        )
+        
+        if echo "$PDB_STATUS_AFTER" | grep -q "READ WRITE"; then
+            log_info "Pluggable database XEPDB1 opened successfully"
+            return 0
+        else
+            log_error "Failed to open pluggable database XEPDB1"
+            return 1
+        fi
+    fi
+}
+
 # Function to check if Oracle is ready
 check_oracle_ready() {
     local max_attempts=30
@@ -43,8 +87,16 @@ SELECT 'DB_READY' FROM dual;
 EXIT;
 EOF
         then
-            log_info "Oracle Database is ready!"
-            return 0
+            # Database is ready, now check pluggable database
+            if check_and_open_pdb; then
+                log_info "Oracle Database and PDB are ready!"
+                return 0
+            else
+                log_warn "Pluggable database not ready yet, waiting..."
+                sleep 10
+                ((attempt++))
+                continue
+            fi
         fi
         
         log_warn "Database not ready yet, waiting..."
@@ -117,6 +169,7 @@ SET FEEDBACK OFF
 SET HEADING OFF
 SET PAGESIZE 0
 
+-- First ensure we're connected to the right container
 ALTER SESSION SET CONTAINER=XEPDB1;
 
 -- Check if user already exists
@@ -129,14 +182,25 @@ BEGIN
     EXECUTE IMMEDIATE 'DROP USER dbs401 CASCADE';
     DBMS_OUTPUT.PUT_LINE('OLD_USER_DROPPED');
   END IF;
+EXCEPTION
+  WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE('ERROR_CHECKING_USER: ' || SQLERRM);
 END;
 /
 
-CREATE USER dbs401 IDENTIFIED BY try_t0_hack_dbs401;
-GRANT CONNECT, RESOURCE TO dbs401;
-ALTER USER dbs401 QUOTA UNLIMITED ON USERS;
+-- Create the user
+BEGIN
+  EXECUTE IMMEDIATE 'CREATE USER dbs401 IDENTIFIED BY try_t0_hack_dbs401';
+  EXECUTE IMMEDIATE 'GRANT CONNECT, RESOURCE TO dbs401';
+  EXECUTE IMMEDIATE 'ALTER USER dbs401 QUOTA UNLIMITED ON USERS';
+  DBMS_OUTPUT.PUT_LINE('USER_CREATED_SUCCESS');
+EXCEPTION
+  WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE('ERROR_CREATING_USER: ' || SQLERRM);
+    RAISE;
+END;
+/
 
-SELECT 'USER_CREATED_SUCCESS' FROM dual;
 EXIT;
 EOF
 )
