@@ -10,20 +10,15 @@ sudo apt install docker-compose -y
 
 # Cài đặt project (require auth)
 echo "Cloning repository..."
-# Using environment variables set by start.sh
-git clone "https://$GITHUB_USERNAME:$GITHUB_PAT@github.com/Kinabler/DBS401.git"
+git clone https://Kinabler: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@github.com/Kinabler/DBS401.git
 cd DBS401
-
 # Spawn all docker container
 echo "Starting Docker containers..."
-# Using sudo -E to preserve environment variables
-sudo -E docker-compose up -d
-
+sudo docker-compose up -d
 # Initialize database
 echo "Initializing database..."
 sudo chmod +x init-db.sh
-# Using sudo -E to preserve environment variables
-sudo -E ./init-db.sh
+sudo ./init-db.sh
 
 # Add config file
 sudo ufw enable
