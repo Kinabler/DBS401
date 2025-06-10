@@ -5,7 +5,9 @@ FROM node:22-slim
 WORKDIR /app
 
 # Install system dependencies
-RUN apt-get update -y && apt-get upgrade -y
+RUN apt-get update -y && \
+    apt-get install -y apt-utils && \
+    apt-get upgrade -y
 
 # Create app directories with proper permissions
 RUN mkdir -p /app/public/uploads/memes /app/public/uploads/profiles && \
@@ -16,8 +18,7 @@ RUN mkdir -p /app/public/uploads/memes /app/public/uploads/profiles && \
 COPY --chown=www-data:www-data package*.json ./
 
 # Install dependencies
-RUN npm audit fix --force
-RUN npm ci --omit=dev && npm audit fix --omit=dev
+RUN npm ci --omit=dev
 # Copy the rest of the application
 COPY --chown=www-data:www-data . .
 
