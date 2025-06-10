@@ -6,17 +6,16 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "${PORT}:${PORT}"
     environment:
-      - HOST=0.0.0.0
-      - PORT=8080
-      - DB_PASSWORD=try_t0_hack_dbs401
-      - DB_USER=dbs401
-      # Important: use the service name instead of localhost
-      - DB_CONNECT_STRING=oracle-db:1521/XEPDB1
-      - JWT_SECRET=0a0dd7f9-5f45-485d-9ffd-054651192402
-      - DB_CHECK_STRING=oracle-db
-      - DBS401_FLAG2=G2{y0u_4r3_4lr3ady_expl0ited_l0c4l_file_inclu5ion}
+      - HOST=${HOST}
+      - PORT=${PORT}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_USER=${DB_USER}
+      - DB_CONNECT_STRING=${DB_CONNECT_STRING}
+      - JWT_SECRET=${JWT_SECRET}
+      - DB_CHECK_STRING=${DB_CHECK_STRING}
+      - DBS401_FLAG2=${DBS401_FLAG2}
     volumes:
       # Mount source code directory to container
       - ./src:/app/src
@@ -35,15 +34,15 @@ services:
       - "1521:1521"
       - "5500:5500"
     environment:
-      - ORACLE_PWD=let-me-in
-      - ORACLE_CHARACTERSET=AL32UTF8
+      - ORACLE_PWD=${ORACLE_PWD}
+      - ORACLE_CHARACTERSET=${ORACLE_CHARACTERSET}
     volumes:
       - ./init-scripts:/opt/oracle/scripts/setup
     # Don't use persistent storage, so database resets on each restart
     # - oracle-data:/opt/oracle/oradata
     restart: "no"
     healthcheck:
-      test: [ "CMD", "sqlplus", "-L", "system/let-me-in@//localhost:1521/XEPDB1", "AS", "SYSDBA", "<<< 'SELECT 1 FROM DUAL;'" ]
+      test: [ "CMD", "sqlplus", "-L", "system/${ORACLE_PWD}@//localhost:1521/XEPDB1", "AS", "SYSDBA", "<<< 'SELECT 1 FROM DUAL;'" ]
       interval: 10s
       timeout: 10s
       retries: 10

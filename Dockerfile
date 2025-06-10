@@ -5,18 +5,27 @@ FROM node:22-slim
 WORKDIR /app
 
 # Install system dependencies
-RUN  apt-get update -y && apt-get upgrade -y
+RUN apt-get update -y && apt-get upgrade -y
+
+# Ensure www-data user exists (should already exist in Debian-based images)
+# and create app directories with proper permissions
+RUN groupadd -r www-data || true && \
+    useradd -r -g www-data www-data || true && \
+    mkdir -p /app/public/uploads/memes /app/public/uploads/profiles && \
+    chown -R www-data:www-data /app && \
+    chmod -R 755 /app
 
 # Copy package.json and package-lock.json
-COPY package*.json ./
+COPY --chown=www-data:www-data package*.json ./
 # Copy the rest of the application
-COPY ./src ./src
+COPY --chown=www-data:www-data ./src ./src
 
-# Install dependencies
+# Install dependencies as www-data
+USER www-data
 RUN npm install
 
 # Expose the port the app will run on
 EXPOSE 8080
 
-# Command to run the application
+# Command to run the application (already as www-data user)
 CMD ["npm", "run", "start"]

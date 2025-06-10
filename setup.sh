@@ -8,13 +8,20 @@ sudo apt-get update
 sudo apt-get install docker.io -y
 sudo apt install docker-compose -y
 
+# Load environment variables
+echo "Loading environment variables..."
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/start.sh"
+
 # Cài đặt project (require auth)
 echo "Cloning repository..."
-git clone https://Kinabler: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@github.com/Kinabler/DBS401.git
+git clone "https://$GITHUB_USERNAME:$GITHUB_PAT@github.com/Kinabler/DBS401.git"
 cd DBS401
+
 # Spawn all docker container
 echo "Starting Docker containers..."
 sudo docker-compose up -d
+
 # Initialize database
 echo "Initializing database..."
 sudo chmod +x init-db.sh
