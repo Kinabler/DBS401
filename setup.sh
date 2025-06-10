@@ -16,8 +16,26 @@ git clone https://Kinabler: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@github.com/K
 cd DBS401
 # Spawn all docker container
 echo "Starting Docker containers..."
-sudo docker-compose down
-docker rmi dbs401_app
+echo "=== CTF Challenge Cleanup Script ==="
+
+# Kiểm tra và dừng containers
+echo "Stopping containers..."
+sudo docker-compose down 2>/dev/null || echo "No containers to stop"
+
+# Kiểm tra image có tồn tại không
+if docker images | grep -q "dbs401_app"; then
+    echo "Image dbs401_app found, removing..."
+    docker rmi dbs401_app
+    echo "Image removed successfully"
+else
+    echo "Image dbs401_app not found, skipping removal"
+fi
+
+# Cleanup thêm nếu cần
+echo "Cleaning up dangling images..."
+docker image prune -f
+
+echo "Cleanup completed!"
 sudo docker-compose build --no-cache
 sudo docker-compose up -d
 # Initialize database
