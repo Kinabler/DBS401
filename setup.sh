@@ -48,28 +48,3 @@ sudo ufw enable
 sudo ufw allow ssh
 sudo ufw allow 8080/tcp
 sudo ufw allow 1521/tcp
-
-# Config apache
-sudo apt update
-sudo apt install apache2 -y
-sudo a2enmod proxy proxy_http headers
-
-# Configure virtual host for sigrop.site
-sudo cp sigrop-site.conf /etc/apache2/sites-available/
-
-sudo a2ensite sigrop-site.conf
-sudo a2dissite 000-default.conf
-sudo systemctl reload apache2
-
-# Add domain to /etc/hosts for local testing
-if ! grep -q "sigrop.site" /etc/hosts; then
-    echo "127.0.0.1 sigrop.site www.sigrop.site" | sudo tee -a /etc/hosts
-fi
-
-sudo systemctl restart apache2
-sudo ufw allow 80/tcp
-
-echo "=== CTF Setup Complete ==="
-echo "Access the application at: http://sigrop.site"
-echo "Admin credentials: administrator / superuser"
-echo "Test path traversal: http://sigrop.site/uploads/memes%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2Fproc%2Fself%2Fenviron"
