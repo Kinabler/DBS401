@@ -1,16 +1,18 @@
+version: '3'
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
+    # Remove host port mapping; port 8080 is accessible internally
+    expose:
+      - "8080"
     environment:
       - HOST=0.0.0.0
       - PORT=8080
       - DB_PASSWORD=try_t0_hack_dbs401
       - DB_USER=dbs401
-      # Important: use the service name instead of localhost
+      # Use service name for internal communication
       - DB_CONNECT_STRING=oracle-db:1521/XEPDB1
       - JWT_SECRET=0a0dd7f9-5f45-485d-9ffd-054651192402
       - DB_CHECK_STRING=oracle-db
@@ -29,9 +31,10 @@ services:
 
   oracle-db:
     image: container-registry.oracle.com/database/express:21.3.0-xe
-    ports:
-      - "1521:1521"
-      - "5500:5500"
+    # Remove host port mappings; ports 1521 and 5500 are accessible internally
+    expose:
+      - "1521"
+      - "5500"
     environment:
       - ORACLE_PWD=let-me-in
       - ORACLE_CHARACTERSET=AL32UTF8
@@ -41,7 +44,7 @@ services:
     # - oracle-data:/opt/oracle/oradata
     restart: "no"
     healthcheck:
-      test: [ "CMD", "sqlplus", "-L", "system/let-me-in@//localhost:1521/XEPDB1", "AS", "SYSDBA", "<<< 'SELECT 1 FROM DUAL;'" ]
+      test: [ "CMD", "sqlplus", "-L", "system/let-me-in@//oracle-db:1521/XEPDB1", "AS", "SYSDBA", "<<< 'SELECT 1 FROM DUAL;'" ]
       interval: 10s
       timeout: 10s
       retries: 10
