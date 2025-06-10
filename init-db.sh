@@ -167,7 +167,7 @@ SET ECHO OFF
 SET FEEDBACK ON
 SET HEADING OFF
 SET PAGESIZE 0
-SET SERVEROUTPUT ON
+SET SERVEROUTPUT ON SIZE 1000000
 
 -- First ensure we're connected to the right container
 ALTER SESSION SET CONTAINER=XEPDB1;
@@ -175,7 +175,6 @@ ALTER SESSION SET CONTAINER=XEPDB1;
 -- Check if user already exists and create user
 DECLARE
   user_count NUMBER;
-  v_sql VARCHAR2(1000);
 BEGIN
   -- Check if user exists
   SELECT COUNT(*) INTO user_count FROM dba_users WHERE username = 'DBS401';
@@ -210,9 +209,13 @@ END;
 EXIT;
 EOF
 )
-    
+
+    # Parse and log the output
     if echo "$CREATE_USER_RESULT" | grep -q "USER_CREATED_SUCCESS"; then
         log_info "Database user created successfully"
+    elif echo "$CREATE_USER_RESULT" | grep -q "ERROR:"; then
+        log_error "Error during user creation: $(echo "$CREATE_USER_RESULT" | grep 'ERROR:')"
+        exit 1
     else
         log_error "Failed to create database user"
         log_error "Output: $CREATE_USER_RESULT"
