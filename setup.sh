@@ -14,6 +14,7 @@ git clone https://Kinabler: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@github.com/K
 cd DBS401
 # Spawn all docker container
 echo "Starting Docker containers..."
+sudo docker-compose build --no-cache
 sudo docker-compose up -d
 # Initialize database
 echo "Initializing database..."

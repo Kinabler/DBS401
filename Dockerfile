@@ -20,8 +20,15 @@ COPY --chown=www-data:www-data package*.json ./
 # Copy the rest of the application
 COPY --chown=www-data:www-data ./src ./src
 
-# Install dependencies as www-data
+# Switch to the www-data user
 USER www-data
+
+# Configure npm to use a custom cache directory within /app
+# This prevents npm from trying to write to /var/www
+RUN mkdir -p /app/.npm-cache && \
+    npm config set cache /app/.npm-cache --global
+
+# Install dependencies as www-data
 RUN npm install
 
 # Expose the port the app will run on
