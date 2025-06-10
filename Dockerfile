@@ -11,16 +11,19 @@ RUN apt-get update -y && \
 
 # Create app directories with proper permissions
 RUN mkdir -p /app/public/uploads/memes /app/public/uploads/profiles && \
-    chown -R www-data:www-data /app && \
     chmod -R 755 /app
 
 # Copy package.json and package-lock.json
-COPY --chown=www-data:www-data package*.json ./
+COPY package*.json ./
 
-# Install dependencies
+# Install dependencies as root
 RUN npm ci --omit=dev
+
 # Copy the rest of the application
-COPY --chown=www-data:www-data . .
+COPY . .
+
+# Set proper ownership of all files after installation
+RUN chown -R www-data:www-data /app
 
 # Switch to the www-data user
 USER www-data
