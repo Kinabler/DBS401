@@ -10,7 +10,9 @@ RUN apt-get update -y && \
     apt-get upgrade -y
 
 # Create app directories with proper permissions
-RUN mkdir -p /app/public/uploads/memes /app/public/uploads/profiles && \
+RUN mkdir -p /app/public/uploads/memes /app/public/uploads/profiles \
+    /app/src/public/uploads/memes /app/src/public/uploads/profiles && \
+    chown -R www-data:www-data /app && \
     chmod -R 755 /app
 
 # Copy package.json and package-lock.json

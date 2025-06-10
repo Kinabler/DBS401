@@ -2,6 +2,8 @@
 # Exit on error
 set -e
 cd /
+# Clean source
+rm -rf DBS401
 echo "Installing required packages..."
 # Install pre-require
 sudo apt-get update
