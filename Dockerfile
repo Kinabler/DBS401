@@ -4,30 +4,31 @@ FROM node:22-alpine
 # Set the working directory in the container
 WORKDIR /app
 
-# Create a non-root user and group for security.
-# This step ensures the 'www-data' user exists before it's used later.
-RUN addgroup -S www-data && adduser -S www-data -G www-data
-
-# Copy package.json and package-lock.json first to leverage build cache
+# Copy package.json and package-lock.json
 COPY package*.json ./
 
 # Install dependencies
 RUN npm install
 
-# Copy the rest of the application source code (respecting .dockerignore)
+# Create www-data user and group for running the application
+# Using numeric IDs for better compatibility across systems
+RUN addgroup -g 82 www-data && \
+    adduser -u 82 -G www-data -s /bin/sh -D www-data
+
+# Copy only necessary files (src and public will be mounted as volumes)
 COPY . .
 
-# Create upload directories and set all file permissions in a single, efficient step.
-# This command will now succeed because the 'www-data' user has been created.
+# Make the uploads directory writable
 RUN mkdir -p /app/public/uploads/memes /app/public/uploads/profiles && \
-    chmod -R 770 /app/public/uploads && \
-    chown -R www-data:www-data /app
+    chown -R www-data:www-data /app && \
+    chmod -R 755 /app && \
+    chmod -R 770 /app/public/uploads
 
-# Switch to the non-root user for better security
+# Switch to the non-root user
 USER www-data
 
 # Expose the port the app will run on
 EXPOSE 8080
 
-# Command to run the application when the container starts
+# Command to run the application
 CMD ["npm", "run", "start"]
