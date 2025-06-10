@@ -52,7 +52,7 @@ sudo ufw allow 1521/tcp
 # Config apache
 sudo apt update
 sudo apt install apache2 -y
-sudo a2enmod proxy proxy_http -y
+sudo a2enmod proxy proxy_http
 
 # Configure virtual host for sigrop.site
 sudo tee /etc/apache2/sites-available/sigrop-site.conf > /dev/null <<EOL
@@ -62,7 +62,7 @@ sudo tee /etc/apache2/sites-available/sigrop-site.conf > /dev/null <<EOL
 
     ProxyPreserveHost On
     
-    ProxyPass / http://localhost:8080/ nocanon
+    ProxyPass / http://localhost:8080/ retry=0
     ProxyPassReverse / http://localhost:8080/
     
     AllowEncodedSlashes On
@@ -70,10 +70,14 @@ sudo tee /etc/apache2/sites-available/sigrop-site.conf > /dev/null <<EOL
     LimitRequestFieldSize 32768
     LimitRequestLine 32768
 
-    AllowDotInPath On
-
+    # Bỏ dòng AllowDotInPath On vì không tồn tại
+    
     ErrorLog ${APACHE_LOG_DIR}/sigrop-error.log
     CustomLog ${APACHE_LOG_DIR}/sigrop-access.log combined
+    
+    # Thêm các directive bảo mật (tùy chọn)
+    ProxyTimeout 300
+    ProxyBadHeader Ignore
 </VirtualHost>
 EOL
 
@@ -86,4 +90,4 @@ if ! grep -q "sigrop.site" /etc/hosts; then
 fi
 
 sudo systemctl restart apache2
-
+sudo ufw allow 80/tcp
