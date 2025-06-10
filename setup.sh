@@ -17,6 +17,7 @@ cd DBS401
 # Spawn all docker container
 echo "Starting Docker containers..."
 sudo docker-compose down
+docker rmi dbs401_app
 sudo docker-compose build --no-cache
 sudo docker-compose up -d
 # Initialize database
