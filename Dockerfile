@@ -11,7 +11,7 @@ COPY package*.json ./
 RUN npm install
 
 # Create a non-root user and group for security
-RUN addgroup -S www-data && adduser -S www-data -G www-data
+# RUN addgroup -S www-data && adduser -S www-data -G www-data
 
 # Copy application source code (respecting .dockerignore)
 COPY . .
