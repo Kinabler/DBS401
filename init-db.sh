@@ -163,40 +163,46 @@ main() {
     # Create user with better error handling
     log_info "Creating database user..."
     CREATE_USER_RESULT=$(docker-compose exec -T oracle-db sqlplus -s / as sysdba << EOF
-WHENEVER SQLERROR EXIT SQL.SQLCODE
 SET ECHO OFF
-SET FEEDBACK OFF
+SET FEEDBACK ON
 SET HEADING OFF
 SET PAGESIZE 0
+SET SERVEROUTPUT ON
 
 -- First ensure we're connected to the right container
 ALTER SESSION SET CONTAINER=XEPDB1;
 
--- Check if user already exists
+-- Check if user already exists and create user
 DECLARE
   user_count NUMBER;
+  v_sql VARCHAR2(1000);
 BEGIN
+  -- Check if user exists
   SELECT COUNT(*) INTO user_count FROM dba_users WHERE username = 'DBS401';
+  
   IF user_count > 0 THEN
     DBMS_OUTPUT.PUT_LINE('USER_EXISTS');
     EXECUTE IMMEDIATE 'DROP USER dbs401 CASCADE';
     DBMS_OUTPUT.PUT_LINE('OLD_USER_DROPPED');
   END IF;
-EXCEPTION
-  WHEN OTHERS THEN
-    DBMS_OUTPUT.PUT_LINE('ERROR_CHECKING_USER: ' || SQLERRM);
-END;
-/
-
--- Create the user
-BEGIN
+  
+  -- Create the user
   EXECUTE IMMEDIATE 'CREATE USER dbs401 IDENTIFIED BY try_t0_hack_dbs401';
+  DBMS_OUTPUT.PUT_LINE('USER_CREATED');
+  
+  -- Grant privileges
   EXECUTE IMMEDIATE 'GRANT CONNECT, RESOURCE TO dbs401';
+  DBMS_OUTPUT.PUT_LINE('PRIVILEGES_GRANTED');
+  
+  -- Set quota
   EXECUTE IMMEDIATE 'ALTER USER dbs401 QUOTA UNLIMITED ON USERS';
+  DBMS_OUTPUT.PUT_LINE('QUOTA_SET');
+  
   DBMS_OUTPUT.PUT_LINE('USER_CREATED_SUCCESS');
+  
 EXCEPTION
   WHEN OTHERS THEN
-    DBMS_OUTPUT.PUT_LINE('ERROR_CREATING_USER: ' || SQLERRM);
+    DBMS_OUTPUT.PUT_LINE('ERROR: ' || SQLERRM);
     RAISE;
 END;
 /
