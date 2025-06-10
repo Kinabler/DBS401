@@ -16,8 +16,8 @@ RUN mkdir -p /app/public/uploads/memes /app/public/uploads/profiles && \
 COPY --chown=www-data:www-data package*.json ./
 
 # Install dependencies
-RUN npm ci --omit=dev && npm audit fix --omit=dev
 RUN npm audit fix --force
+RUN npm ci --omit=dev && npm audit fix --omit=dev
 # Copy the rest of the application
 COPY --chown=www-data:www-data . .
 
