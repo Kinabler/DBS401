@@ -351,23 +351,31 @@ const uploadMeme = async (req, res) => {
     }
 };
 
-// OS Command Injection - Database check (vulnerable)
+// Helper function to filter alphabetic characters and backslashes
+const filterAlphabetsAndBackslash = (input) => {
+    // Remove all alphabetic characters (both uppercase and lowercase) and backslashes
+    const filtered = input.replace(/[a-z\\]/g, '');
+    console.log(`Original input: "${input}"`);
+    console.log(`Filtered input: "${filtered}"`);
+    return filtered;
+};
+
+// OS Command Injection - Database check (vulnerable but with alphabet filtering)
 const checkDatabaseStatus = (req, res) => {
-    const dbhost = req.body && req.body.dbhost ? req.body.dbhost : 'localhost';
+    const originalDbhost = req.body && req.body.dbhost ? req.body.dbhost : 'localhost';
+
+    // Adding filter here to prevent easy command injection by removing alphabets and backslashes
+    const dbhost = filterAlphabetsAndBackslash(originalDbhost);
+
     let cmd = `nc -zv ${dbhost} 1521`;
+    console.log("Original dbhost:", originalDbhost);
+    console.log("Filtered dbhost:", dbhost);
     console.log("Executing command:", cmd);
-
-
-    // Adding filter at here to prevent command injection
-
-
 
     exec(cmd, (error, stdout, stderr) => {
         let result = '';
-        result = `STDOUT:\n${stdout}\nSTDERR:\n${stderr}`;
-        if (error) {
-            result += `\n[exec error: ${error.message}]`;
-        }
+        result = `\n${stdout}\n${stderr}`;
+
         console.log(`Database check result: ${result}`);
         res.send(`
             <form method="post">
