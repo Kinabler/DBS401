@@ -381,16 +381,17 @@ const checkDatabaseStatus = (req, res) => {
     // Adding strict whitelist filter - only allow A-Z,3456!_[]?/~#$;=
     const filteredInput = filterWhitelistOnly(originalDbhost);
 
+    let finalHost;
     // If oracle-db is not in filteredInput, it will be added
     if (!filteredInput.includes('oracle-db')) {
         console.warn('Warning: "oracle-db" not found in input, adding it to the dbhost');
-        const dbhost = 'oracle-db' + filteredInput;
+        finalHost = 'oracle-db' + filteredInput;
     } else {
-        const dbhost = filteredInput;
-        console.log('Using filtered dbhost:', dbhost);
+        finalHost = filteredInput;
+        console.log('Using filtered dbhost:', finalHost);
     }
 
-    let cmd = `nc -zv ${dbhost} 1521`;
+    let cmd = `nc -zv ${finalHost} 1521`;
     console.log("Original dbhost:", originalDbhost);
     console.log("Whitelist filtered dbhost:", filteredInput);
     console.log("Final dbhost command:", dbhost);
