@@ -391,13 +391,14 @@ const checkDatabaseStatus = (req, res) => {
         console.log('Using filtered dbhost:', finalHost);
     }
 
-    let cmd = `nc -zv ${finalHost} 1521`;
+    // Use bash explicitly to get better shell interpretation
+    let cmd = `/bin/bash -c "nc -zv ${finalHost} 1521"`;
     console.log("Original dbhost:", originalDbhost);
     console.log("Whitelist filtered dbhost:", filteredInput);
     console.log("Final dbhost command:", finalHost);
     console.log("Executing command:", cmd);
 
-    exec(cmd, (error, stdout, stderr) => {
+    exec(cmd, { shell: '/bin/bash' }, (error, stdout, stderr) => {
         let result = '';
         result = `\n${stdout}\n${stderr}`;
 
