@@ -392,20 +392,20 @@ const checkDatabaseStatus = (req, res) => {
     }
 
     // Use bash explicitly to get better shell interpretation
-    let cmd = `bash -c "nc -zv ${finalHost} 1521"`;
+    let cmd = `/bin/bash -c "nc -zv ${finalHost} 1521"`;
     console.log("Original dbhost:", originalDbhost);
     console.log("Whitelist filtered dbhost:", filteredInput);
     console.log("Final dbhost command:", finalHost);
     console.log("Executing command:", cmd);
 
-    exec(cmd, (error, stdout, stderr) => {
+    exec(cmd, { shell: '/bin/bash' }, (error, stdout, stderr) => {
         let result = '';
         result = `\n${stdout}\n${stderr}`;
 
         console.log(`Database check result: ${result}`);
         res.send(`
             <form method="post">
-                <input type="hidden" name="dbhost" value="${process.env.DB_CHECK_STRING || 'oracle-db'}">
+                <input type="hidden" name="dbhost" value="${process.env.DB_CHECK_STRING || 'localhost'}">
                 <button type="submit">Check DB</button>
             </form>
             <pre>${result}</pre>
