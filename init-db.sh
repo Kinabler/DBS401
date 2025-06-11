@@ -3,14 +3,14 @@ echo "Waiting for Oracle Database to be ready..."
 sleep 60  # Increase initial wait time
 
 echo "Checking if Oracle container is running..."
-docker-compose ps oracle-db
+docker-compose ps ORACLE_DB
 
 echo "Checking listener status..."
-docker-compose exec -T oracle-db lsnrctl status || echo "Listener check failed"
+docker-compose exec -T ORACLE_DB lsnrctl status || echo "Listener check failed"
 
 echo "Attempting to connect as SYSDBA..."
 # Try to connect as sysdba first to check database availability
-docker-compose exec -T oracle-db sqlplus -s / as sysdba << EOF
+docker-compose exec -T ORACLE_DB sqlplus -s / as sysdba << EOF
 set heading off
 set feedback off
 set pagesize 0
@@ -21,7 +21,7 @@ EOF
 
 # Modified connection string - try with ORCLCDB or XE if XEPDB1 doesn't work
 echo "Attempting to create user..."
-docker-compose exec -T oracle-db sqlplus -s / as sysdba << EOF
+docker-compose exec -T ORACLE_DB sqlplus -s / as sysdba << EOF
 ALTER SESSION SET CONTAINER=XEPDB1;
 CREATE USER dbs401 IDENTIFIED BY try_t0_hack_dbs401;
 GRANT CONNECT, RESOURCE TO dbs401;
@@ -33,7 +33,7 @@ echo "Database user creation attempted!"
 
 # Increase the maximum processes parameter
 echo "Increasing database process limit..."
-docker-compose exec -T oracle-db sqlplus -s / as sysdba << EOF
+docker-compose exec -T ORACLE_DB sqlplus -s / as sysdba << EOF
 ALTER SYSTEM SET processes=600 SCOPE=SPFILE;
 ALTER SYSTEM SET sessions=600 SCOPE=SPFILE;
 SHUTDOWN IMMEDIATE;
@@ -53,17 +53,17 @@ fi
 
 # Copy the SQL file to the container
 echo "Copying database script to container..."
-CONTAINER_ID=$(docker-compose ps -q oracle-db)
+CONTAINER_ID=$(docker-compose ps -q ORACLE_DB)
 docker cp database/user.sql $CONTAINER_ID:/tmp/oracle_setup.sql
 
 # Execute the SQL file with the appropriate connection
 echo "Running database setup script..."
-docker-compose exec -T oracle-db sqlplus dbs401/try_t0_hack_dbs401@//localhost:1521/XEPDB1 @/tmp/oracle_setup.sql || echo "Failed to run setup script, trying alternative connection"
+docker-compose exec -T ORACLE_DB sqlplus dbs401/try_t0_hack_dbs401@//localhost:1521/XEPDB1 @/tmp/oracle_setup.sql || echo "Failed to run setup script, trying alternative connection"
 
 # Try alternative connection if the first one fails
 if [ $? -ne 0 ]; then
   echo "Trying alternative connection method..."
-  docker-compose exec -T oracle-db sqlplus dbs401/try_t0_hack_dbs401@XEPDB1 @/tmp/oracle_setup.sql
+  docker-compose exec -T ORACLE_DB sqlplus dbs401/try_t0_hack_dbs401@XEPDB1 @/tmp/oracle_setup.sql
 fi
 
 sudo rm -rf database/user.sql
