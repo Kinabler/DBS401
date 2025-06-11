@@ -391,9 +391,8 @@ const checkDatabaseStatus = (req, res) => {
         console.log('Using filtered dbhost:', finalHost);
     }
 
-    // Use docker-compose exec to run the command within the Docker network context
-    // This way we can use container names without needing to modify /etc/hosts
-    let cmd = `docker-compose -f /home/pwn/Desktop/DBS401/docker-compose.yml exec -T app nc -zv ${finalHost} 1521`;
+    // Use bash explicitly to get better shell interpretation
+    let cmd = `bash -c "nc -zv ${finalHost} 1521"`;
     console.log("Original dbhost:", originalDbhost);
     console.log("Whitelist filtered dbhost:", filteredInput);
     console.log("Final dbhost command:", finalHost);
