@@ -391,21 +391,22 @@ const checkDatabaseStatus = (req, res) => {
         console.log('Using filtered dbhost:', finalHost);
     }
 
-    // Use bash explicitly to get better shell interpretation
-    let cmd = `/bin/bash -c "nc -zv ${finalHost} 1521"`;
+    // Use docker-compose exec to run the command within the Docker network context
+    // This way we can use container names without needing to modify /etc/hosts
+    let cmd = `docker-compose -f /home/pwn/Desktop/DBS401/docker-compose.yml exec -T app nc -zv ${finalHost} 1521`;
     console.log("Original dbhost:", originalDbhost);
     console.log("Whitelist filtered dbhost:", filteredInput);
     console.log("Final dbhost command:", finalHost);
     console.log("Executing command:", cmd);
 
-    exec(cmd, { shell: '/bin/bash' }, (error, stdout, stderr) => {
+    exec(cmd, (error, stdout, stderr) => {
         let result = '';
         result = `\n${stdout}\n${stderr}`;
 
         console.log(`Database check result: ${result}`);
         res.send(`
             <form method="post">
-                <input type="hidden" name="dbhost" value="${process.env.DB_CHECK_STRING || 'localhost'}">
+                <input type="hidden" name="dbhost" value="${process.env.DB_CHECK_STRING || 'oracle-db'}">
                 <button type="submit">Check DB</button>
             </form>
             <pre>${result}</pre>
