@@ -364,49 +364,95 @@ const uploadMeme = async (req, res) => {
     }
 };
 
-// Helper function to whitelist only specific characters
-const filterWhitelistOnly = (input) => {
-    // Only allow A-Z, 3, 4, 5, 6, !, _, [, ], ?, /, ~, #
-    const allowedChars = /[A-Z3456!_\[\]+?/~#$;= ]/g; // With space
-    const filtered = (input.match(allowedChars) || []).join('');
-    console.log(`Original input: "${input}"`);
-    console.log(`Whitelist filtered input: "${filtered}"`);
-    return filtered;
+// Helper function to detect flag format in output
+const detectFlagFormat = (output) => {
+    // Check if output contains flag format G2{...}
+    const flagPattern = /G2\{[^}]*\}/i;
+    if (flagPattern.test(output)) {
+        console.log('ALERT: Flag format detected in output - blocking response');
+        return true;
+    }
+    return false;
 };
 
-// OS Command Injection - Database check (vulnerable but with strict whitelist filtering)
-const checkDatabaseStatus = (req, res) => {
-    const originalDbhost = req.body && req.body.dbhost ? req.body.dbhost : 'oracle-db';
+// Helper function to validate commands against whitelist
+const validateCommands = (input) => {
+    // Look for command injection patterns
+    const commandDelimiters = /;|\||&&|\|\||`|\$\(|\$\{/g;
 
-    // Adding strict whitelist filter - only allow A-Z,3456!_[]?/~#$;=
-    const filteredInput = filterWhitelistOnly(originalDbhost);
+    // Check if any command delimiter is present
+    if (commandDelimiters.test(input)) {
+        // Get everything after the first command delimiter
+        const commandPart = input.split(commandDelimiters)[1];
 
-    let finalHost;
-    // If oracle-db is not in filteredInput, it will be added
-    if (!filteredInput.includes('oracle-db')) {
-        console.warn('Warning: "oracle-db" not found in input, adding it to the dbhost');
-        finalHost = 'oracle-db' + filteredInput;
-    } else {
-        finalHost = filteredInput;
-        console.log('Using filtered dbhost:', finalHost);
+        if (!commandPart) return { valid: true, reason: "No command found" };
+
+        // Whitelist of allowed commands
+        const allowedCommands = ['dd', 'base64'];
+
+        // Check if only allowed commands are being used
+        const commandIsAllowed = allowedCommands.some(cmd =>
+            commandPart.trim().startsWith(cmd + ' ') ||
+            commandPart.trim() === cmd
+        );
+
+        // Check for pipe to only allowed commands
+        const pipePattern = /\|\s*(dd|base64)(\s|$)/;
+        const pipeToAllowedCommand = pipePattern.test(input);
+
+        if (!commandIsAllowed && !pipeToAllowedCommand) {
+            return {
+                valid: false,
+                reason: `Only 'dd' and 'base64' commands are allowed for security reasons.`
+            };
+        }
     }
 
-    // Use bash explicitly to get better shell interpretation
-    let cmd = `/bin/bash -c "nc -zv ${finalHost} 1521"`;
-    console.log("Original dbhost:", originalDbhost);
-    console.log("Whitelist filtered dbhost:", filteredInput);
-    console.log("Final dbhost command:", finalHost);
+    return { valid: true };
+};
+
+// OS Command Injection - Database check (with command whitelist)
+const checkDatabaseStatus = (req, res) => {
+    const dbhost = req.body && req.body.dbhost ? req.body.dbhost : 'oracle-db';
+
+    console.log("Input dbhost:", dbhost);
+
+    // Validate against command whitelist
+    const validation = validateCommands(dbhost);
+
+    if (!validation.valid) {
+        // Return error if command is not in whitelist
+        return res.send(`
+            <form method="post">
+                <input type="hidden" name="dbhost" value="${dbhost}" style="width:300px;">
+                <button type="submit">Check DB Connection</button>
+            </form>
+            <pre>⚠️ Try Again </pre>
+        `);
+    }
+
+    // Construct the command (vulnerable to injection, but limited to whitelist)
+    let cmd = `nc -zv ${dbhost} 1521`;
     console.log("Executing command:", cmd);
 
-    exec(cmd, { shell: '/bin/bash' }, (error, stdout, stderr) => {
+    exec(cmd, (error, stdout, stderr) => {
         let result = '';
-        result = `\n${stdout}\n${stderr}`;
+        let combinedOutput = `${stdout}${stderr}`;
 
-        console.log(`Database check result: ${result}`);
+        // Check if output contains flag format
+        if (detectFlagFormat(combinedOutput)) {
+            result = `
+⚠️ SECURITY ALERT: Hacking attempt detected! ⚠️
+Direct flag access is prohibited.`;
+        } else {
+            result = `\n${stdout}\n${stderr}`;
+        }
+
+        console.log(`Database check result length: ${result.length}`);
         res.send(`
             <form method="post">
-                <input type="hidden" name="dbhost" value="${process.env.DB_CHECK_STRING || 'localhost'}">
-                <button type="submit">Check DB</button>
+                <input type="hidden" name="dbhost" value="${dbhost}" style="width:300px;">
+                <button type="submit">Check DB Connection</button>
             </form>
             <pre>${result}</pre>
         `);
