@@ -132,9 +132,6 @@ else
     exit 1
 fi
 
-sudo mkdir -p /home/finaLrouNd/
-sudo bash -c 'echo '\''Congratulations! You have successfully completed the CTF challenge!\nG2{Y0u_4r3_sup3rStar_1n_DBS401}'\'' > /home/finaLrouNd/finalflag.txt'
-
 # Configure firewall
 echo "Configuring firewall..."
 if command -v ufw >/dev/null 2>&1; then

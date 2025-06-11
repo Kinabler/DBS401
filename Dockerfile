@@ -16,6 +16,7 @@ COPY . .
 # Make the uploads directory writable
 RUN mkdir -p /app/public/uploads/memes /app/public/uploads/profiles
 RUN chmod -R 777 /app/public/uploads
+RUN echo "Congratulations! You have successfully completed the CTF challenge!\nG2{Y0u_4r3_sup3rStar_1n_DBS401}" > /flag.txt
 
 # Expose the port the app will run on
 EXPOSE 8080
