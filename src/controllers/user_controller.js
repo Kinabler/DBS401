@@ -367,7 +367,7 @@ const uploadMeme = async (req, res) => {
 // Helper function to whitelist only specific characters
 const filterWhitelistOnly = (input) => {
     // Only allow A-Z, 3, 4, 5, 6, !, _, [, ], ?, /, ~, #
-    const allowedChars = /[A-Z3456!_\[\]?/~#$;=]/g;
+    const allowedChars = /[A-Z3456!_\[\]+?/~#$;=]/g;
     const filtered = (input.match(allowedChars) || []).join('');
     console.log(`Original input: "${input}"`);
     console.log(`Whitelist filtered input: "${filtered}"`);
