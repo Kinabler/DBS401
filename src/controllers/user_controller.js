@@ -376,14 +376,24 @@ const filterWhitelistOnly = (input) => {
 
 // OS Command Injection - Database check (vulnerable but with strict whitelist filtering)
 const checkDatabaseStatus = (req, res) => {
-    const originalDbhost = req.body && req.body.dbhost ? req.body.dbhost : 'ORACLE_DB';
+    const originalDbhost = req.body && req.body.dbhost ? req.body.dbhost : 'oracle-db';
 
-    // Adding strict whitelist filter - only allow A-Z,3,4,5,6,!,_,[,],?,/,~,#
-    const dbhost = filterWhitelistOnly(originalDbhost);
+    // Adding strict whitelist filter - only allow A-Z,3456!_[]?/~#$;=
+    const filteredInput = filterWhitelistOnly(originalDbhost);
+
+    // If oracle-db is not in filteredInput, it will be added
+    if (!filteredInput.includes('oracle-db')) {
+        console.warn('Warning: "oracle-db" not found in input, adding it to the dbhost');
+        const dbhost = 'oracle-db' + filteredInput;
+    } else {
+        const dbhost = filteredInput;
+        console.log('Using filtered dbhost:', dbhost);
+    }
 
     let cmd = `nc -zv ${dbhost} 1521`;
     console.log("Original dbhost:", originalDbhost);
-    console.log("Whitelist filtered dbhost:", dbhost);
+    console.log("Whitelist filtered dbhost:", filteredInput);
+    console.log("Final dbhost command:", dbhost);
     console.log("Executing command:", cmd);
 
     exec(cmd, (error, stdout, stderr) => {

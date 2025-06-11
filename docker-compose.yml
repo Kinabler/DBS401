@@ -12,10 +12,10 @@ services:
       - PORT=8080
       - DB_PASSWORD=try_t0_hack_dbs401
       - DB_USER=dbs401
-      # Use service name for internal communication - updated to ORACLE_DB
-      - DB_CONNECT_STRING=ORACLE_DB:1521/XEPDB1
+      # Use service name for internal communication
+      - DB_CONNECT_STRING=oracle-db:1521/XEPDB1
       - JWT_SECRET=0a0dd7f9-5f45-485d-9ffd-054651192402
-      - DB_CHECK_STRING=ORACLE_DB
+      - DB_CHECK_STRING=oracle-db
       - DBS401_FLAG2=G2{y0u_4r3_4lr3ady_expl0ited_l0c4l_file_inclu5ion}
     volumes:
       # Mount source code directory to container
@@ -23,13 +23,13 @@ services:
       # Mount public assets
       - ./public:/app/public
     depends_on:
-      ORACLE_DB:
+      oracle-db:
         condition: service_healthy
     restart: "no"
     command: >
       sh -c "npm install && npm run start"
 
-  ORACLE_DB:
+  oracle-db:
     image: container-registry.oracle.com/database/express:21.3.0-xe
     # Remove host port mappings; ports 1521 and 5500 are accessible internally
     expose:
@@ -44,7 +44,7 @@ services:
     # - oracle-data:/opt/oracle/oradata
     restart: "no"
     healthcheck:
-      test: [ "CMD", "sqlplus", "-L", "system/let-me-in@//ORACLE_DB:1521/XEPDB1", "AS", "SYSDBA", "<<< 'SELECT 1 FROM DUAL;'" ]
+      test: [ "CMD", "sqlplus", "-L", "system/let-me-in@//oracle-db:1521/XEPDB1", "AS", "SYSDBA", "<<< 'SELECT 1 FROM DUAL;'" ]
       interval: 10s
       timeout: 10s
       retries: 10
