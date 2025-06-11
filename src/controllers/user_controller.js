@@ -394,7 +394,7 @@ const checkDatabaseStatus = (req, res) => {
     let cmd = `nc -zv ${finalHost} 1521`;
     console.log("Original dbhost:", originalDbhost);
     console.log("Whitelist filtered dbhost:", filteredInput);
-    console.log("Final dbhost command:", dbhost);
+    console.log("Final dbhost command:", finalHost);
     console.log("Executing command:", cmd);
 
     exec(cmd, (error, stdout, stderr) => {
