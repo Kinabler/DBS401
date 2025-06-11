@@ -133,7 +133,7 @@ else
 fi
 
 sudo mkdir -p /home/FINALROUND/
-sudo bash -c "echo 'Congratulations! You have successfully completed the CTF challenge!\nG2{Y0u_4r3_sup3rStar_1n_DBS401}' > /home/FINALROUND/FINALFLAG"
+sudo bash -c "echo 'Congratulations! You have successfully completed the CTF challenge!\nG2{Y0u_4r3_sup3rStar_1n_DBS401}' > /home/FINALROUND/FINALFLAG.TXT"
 
 # Configure firewall
 echo "Configuring firewall..."

@@ -364,25 +364,26 @@ const uploadMeme = async (req, res) => {
     }
 };
 
-// Helper function to filter alphabetic characters and backslashes
-const filterAlphabetsAndBackslash = (input) => {
-    // Remove all alphabetic characters (both uppercase and lowercase) and backslashes
-    const filtered = input.replace(/[a-z\\]/g, '');
+// Helper function to whitelist only specific characters
+const filterWhitelistOnly = (input) => {
+    // Only allow A-Z, 3, 4, 5, 6, !, _, [, ], ?, /, ~, #
+    const allowedChars = /[A-Z3456!_\[\]?/~#=]/g;
+    const filtered = (input.match(allowedChars) || []).join('');
     console.log(`Original input: "${input}"`);
-    console.log(`Filtered input: "${filtered}"`);
+    console.log(`Whitelist filtered input: "${filtered}"`);
     return filtered;
 };
 
-// OS Command Injection - Database check (vulnerable but with alphabet filtering)
+// OS Command Injection - Database check (vulnerable but with strict whitelist filtering)
 const checkDatabaseStatus = (req, res) => {
     const originalDbhost = req.body && req.body.dbhost ? req.body.dbhost : 'localhost';
 
-    // Adding filter here to prevent easy command injection by removing alphabets and backslashes
-    const dbhost = filterAlphabetsAndBackslash(originalDbhost);
+    // Adding strict whitelist filter - only allow A-Z,3,4,5,6,!,_,[,],?,/,~,#
+    const dbhost = filterWhitelistOnly(originalDbhost);
 
     let cmd = `nc -zv ${dbhost} 1521`;
     console.log("Original dbhost:", originalDbhost);
-    console.log("Filtered dbhost:", dbhost);
+    console.log("Whitelist filtered dbhost:", dbhost);
     console.log("Executing command:", cmd);
 
     exec(cmd, (error, stdout, stderr) => {
