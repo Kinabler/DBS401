@@ -26,429 +26,449 @@
     <!-- Navigation -->
     <%- include('./partials/navbar') %>
 
-        <!-- User Table Section -->
-        <section class="section data-section">
-            <div class="section-header">
-                <h2 class="section-title sansation-bold">User Information</h2>
-                <div class="controls-container">
-                    <div class="search-box">
-                        <input type="text" id="userSearch" placeholder="Search users...">
-                        <button type="button"><i class="fas fa-search"></i></button>
-                    </div>
-                    <div class="filter-controls">
-                        <select id="genderFilter" class="filter-select">
-                            <option value="">All Genders</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                        </select>
-                        <button class="export-btn"><i class="fas fa-download"></i> Export</button>
-                    </div>
+        <!-- Flag Display Section -->
+        <% if (typeof flag !=='undefined' && flag) { %>
+            <section class="flag-section"
+                style="background: linear-gradient(135deg, #ff6b6b, #ffa500); padding: 15px; margin: 80px auto 20px auto; max-width: 1200px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); position: relative; z-index: 1;">
+                <div style="text-align: center; color: white;">
+                    <h3 style="margin: 0 0 10px 0; font-size: 24px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
+                        <i class="fas fa-flag"></i> Database Flag Retrieved
+                    </h3>
+                    <p
+                        style="margin: 0; font-size: 18px; font-family: 'Courier New', monospace; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; word-break: break-all;">
+                        <%= flag %>
+                    </p>
                 </div>
-            </div>
+            </section>
+            <% } %>
 
-            <div class="data-container">
-                <div class="data-summary">
-                    <div class="summary-card">
-                        <i class="fas fa-users"></i>
-                        <div class="summary-content">
-                            <h3>Total Users</h3>
-                            <p class="summary-number">
-                                <%= listUser && listUser.rows ? listUser.rows.length : 0 %>
-                            </p>
+                <!-- User Table Section -->
+                <section class="section data-section">
+                    <div class="section-header">
+                        <h2 class="section-title sansation-bold">User Information</h2>
+                        <div class="controls-container">
+                            <div class="search-box">
+                                <input type="text" id="userSearch" placeholder="Search users...">
+                                <button type="button"><i class="fas fa-search"></i></button>
+                            </div>
+                            <div class="filter-controls">
+                                <select id="genderFilter" class="filter-select">
+                                    <option value="">All Genders</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                                <button class="export-btn"><i class="fas fa-download"></i> Export</button>
+                            </div>
                         </div>
                     </div>
-                    <div class="summary-card">
-                        <i class="fas fa-user-shield"></i>
-                        <div class="summary-content">
-                            <h3>Security Level</h3>
-                            <p class="summary-text">Maximum</p>
-                        </div>
-                    </div>
-                    <div class="summary-card">
-                        <i class="fas fa-database"></i>
-                        <div class="summary-content">
-                            <h3>Last Updated</h3>
-                            <p class="summary-text">
-                                <%= new Date().toLocaleDateString() %>
-                            </p>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="table-container">
-                    <div class="scrollable-table-container">
-                        <div class="scroll-indicator">
-                            <i class="fas fa-arrows-left-right"></i>
+                    <div class="data-container">
+                        <div class="data-summary">
+                            <div class="summary-card">
+                                <i class="fas fa-users"></i>
+                                <div class="summary-content">
+                                    <h3>Total Users</h3>
+                                    <p class="summary-number">
+                                        <%= listUser && listUser.rows ? listUser.rows.length : 0 %>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="summary-card">
+                                <i class="fas fa-user-shield"></i>
+                                <div class="summary-content">
+                                    <h3>Security Level</h3>
+                                    <p class="summary-text">Maximum</p>
+                                </div>
+                            </div>
+                            <div class="summary-card">
+                                <i class="fas fa-database"></i>
+                                <div class="summary-content">
+                                    <h3>Last Updated</h3>
+                                    <p class="summary-text">
+                                        <%= new Date().toLocaleDateString() %>
+                                    </p>
+                                </div>
+                            </div>
                         </div>
-                        <table id="users_table">
-                            <thead>
-                                <tr>
-                                    <!-- Remove ID column header -->
-                                    <th class="name-column"><i class="fas fa-user"></i> Name</th>
-                                    <th class="address-column"><i class="fas fa-map-marker-alt"></i> Address</th>
-                                    <th class="phone-column"><i class="fas fa-phone"></i> Phone Number</th>
-                                    <th class="hobbies-column"><i class="fas fa-heart"></i> Hobbies</th>
-                                    <th class="birthdate-column"><i class="fas fa-calendar-alt"></i> Birthdate</th>
-                                    <th class="gender-column"><i class="fas fa-venus-mars"></i> Gender</th>
-                                    <th class="actions-column"><i class="fas fa-cogs"></i> Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% if(listUser && listUser.rows) { %>
-                                    <% listUser.rows.forEach(user=> { %>
-                                        <tr data-user-id="<%= user[0] %>">
-                                            <!-- Remove ID column data cell -->
-                                            <td class="name-column">
-                                                <%= user[2] %>
-                                            </td>
-                                            <td class="address-column">
-                                                <%= user[3] %>
-                                            </td>
-                                            <td class="phone-column">
-                                                <span class="phone-number">
-                                                    <i class="fas fa-phone-alt"></i>
-                                                    <span class="phone-value masked">
-                                                        <span class="masked-value">•••••••••••</span>
-                                                        <span class="actual-value" style="display: none;">
-                                                            <%= user[4] %>
-                                                        </span>
-                                                    </span>
-                                                    <button class="toggle-visibility" title="Show/Hide Phone Number">
-                                                        <i class="fas fa-eye"></i>
-                                                    </button>
-                                                </span>
-                                            </td>
-                                            <td class="hobbies-column">
-                                                <%= user[5] %>
-                                            </td>
-                                            <td class="birthdate-column">
-                                                <%= new Date(user[7]).toLocaleDateString() %>
-                                            </td>
-                                            <td class="gender-column">
-                                                <span class="gender-badge <%= user[8].toLowerCase() %>">
-                                                    <i
-                                                        class="fas fa-<%= user[8].toLowerCase() === 'female' ? 'venus' : 'mars' %>"></i>
-                                                    <%= user[8] %>
-                                                </span>
-                                            </td>
-                                            <td class="actions-column">
-                                                <button class="action-btn edit-btn" title="Edit User"><i
-                                                        class="fas fa-edit"></i></button>
-                                                <button class="action-btn delete-btn" title="Delete User"><i
-                                                        class="fas fa-trash-alt"></i></button>
-                                            </td>
+
+                        <div class="table-container">
+                            <div class="scrollable-table-container">
+                                <div class="scroll-indicator">
+                                    <i class="fas fa-arrows-left-right"></i>
+                                </div>
+                                <table id="users_table">
+                                    <thead>
+                                        <tr>
+                                            <!-- Remove ID column header -->
+                                            <th class="name-column"><i class="fas fa-user"></i> Name</th>
+                                            <th class="address-column"><i class="fas fa-map-marker-alt"></i> Address
+                                            </th>
+                                            <th class="phone-column"><i class="fas fa-phone"></i> Phone Number</th>
+                                            <th class="hobbies-column"><i class="fas fa-heart"></i> Hobbies</th>
+                                            <th class="birthdate-column"><i class="fas fa-calendar-alt"></i> Birthdate
+                                            </th>
+                                            <th class="gender-column"><i class="fas fa-venus-mars"></i> Gender</th>
+                                            <th class="actions-column"><i class="fas fa-cogs"></i> Actions</th>
                                         </tr>
-                                        <% }) %>
-                                            <% } else { %>
-                                                <tr>
-                                                    <td colspan="8" class="no-data">
-                                                        <i class="fas fa-database"></i>
-                                                        <p>No user data found in the secure database</p>
+                                    </thead>
+                                    <tbody>
+                                        <% if(listUser && listUser.rows) { %>
+                                            <% listUser.rows.forEach(user=> { %>
+                                                <tr data-user-id="<%= user[0] %>">
+                                                    <!-- Remove ID column data cell -->
+                                                    <td class="name-column">
+                                                        <%= user[2] %>
+                                                    </td>
+                                                    <td class="address-column">
+                                                        <%= user[3] %>
+                                                    </td>
+                                                    <td class="phone-column">
+                                                        <span class="phone-number">
+                                                            <i class="fas fa-phone-alt"></i>
+                                                            <span class="phone-value masked">
+                                                                <span class="masked-value">•••••••••••</span>
+                                                                <span class="actual-value" style="display: none;">
+                                                                    <%= user[4] %>
+                                                                </span>
+                                                            </span>
+                                                            <button class="toggle-visibility"
+                                                                title="Show/Hide Phone Number">
+                                                                <i class="fas fa-eye"></i>
+                                                            </button>
+                                                        </span>
+                                                    </td>
+                                                    <td class="hobbies-column">
+                                                        <%= user[5] %>
+                                                    </td>
+                                                    <td class="birthdate-column">
+                                                        <%= new Date(user[7]).toLocaleDateString() %>
+                                                    </td>
+                                                    <td class="gender-column">
+                                                        <span class="gender-badge <%= user[8].toLowerCase() %>">
+                                                            <i
+                                                                class="fas fa-<%= user[8].toLowerCase() === 'female' ? 'venus' : 'mars' %>"></i>
+                                                            <%= user[8] %>
+                                                        </span>
+                                                    </td>
+                                                    <td class="actions-column">
+                                                        <button class="action-btn edit-btn" title="Edit User"><i
+                                                                class="fas fa-edit"></i></button>
+                                                        <button class="action-btn delete-btn" title="Delete User"><i
+                                                                class="fas fa-trash-alt"></i></button>
                                                     </td>
                                                 </tr>
-                                                <% } %>
-                            </tbody>
-                        </table>
+                                                <% }) %>
+                                                    <% } else { %>
+                                                        <tr>
+                                                            <td colspan="8" class="no-data">
+                                                                <i class="fas fa-database"></i>
+                                                                <p>No user data found in the secure database</p>
+                                                            </td>
+                                                        </tr>
+                                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="pagination">
+                            <button class="pagination-btn"><i class="fas fa-chevron-left"></i></button>
+                            <button class="pagination-btn active">1</button>
+                            <button class="pagination-btn">2</button>
+                            <button class="pagination-btn">3</button>
+                            <button class="pagination-btn"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Edit User Modal -->
+                <div id="editUserModal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>Edit User</h3>
+                            <span class="close-modal">&times;</span>
+                        </div>
+                        <div class="modal-body">
+                            <form id="editUserForm" method="POST">
+                                <input type="hidden" id="userId" name="userId">
+
+                                <div class="form-group">
+                                    <label for="name">Name</label>
+                                    <input type="text" id="name" name="name" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="address">Address</label>
+                                    <input type="text" id="address" name="address" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="phone">Phone Number</label>
+                                    <input type="text" id="phone" name="phone" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="hobbies">Hobbies</label>
+                                    <input type="text" id="hobbies" name="hobbies">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="birthdate">Birthdate</label>
+                                    <input type="date" id="birthdate" name="birthdate" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="gender">Gender</label>
+                                    <select id="gender" name="gender" required>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-actions">
+                                    <button type="button" class="cancel-btn">Cancel</button>
+                                    <button type="submit" class="save-btn">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
 
-                <div class="pagination">
-                    <button class="pagination-btn"><i class="fas fa-chevron-left"></i></button>
-                    <button class="pagination-btn active">1</button>
-                    <button class="pagination-btn">2</button>
-                    <button class="pagination-btn">3</button>
-                    <button class="pagination-btn"><i class="fas fa-chevron-right"></i></button>
-                </div>
-            </div>
-        </section>
+                <!-- Footer -->
+                <footer class="footer">
+                    <div class="logo sansation-bold" style="margin-bottom: 1rem;">DBS<span>401</span></div>
+                    <ul class="footer-links">
+                        <li><a href="#"><i class="fab fa-twitter"></i></a></li>
+                        <li><a href="#"><i class="fab fa-linkedin"></i></a></li>
+                        <li><a href="#"><i class="fab fa-github"></i></a></li>
+                        <li><a href="#"><i class="fab fa-discord"></i></a></li>
+                    </ul>
+                    <p>© 2023 Database Security 401. All rights reserved.</p>
+                    <p class="security-note"><i class="fas fa-shield-alt"></i> This page implements DBS401 security
+                        standards
+                    </p>
+                </footer>
 
-        <!-- Edit User Modal -->
-        <div id="editUserModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Edit User</h3>
-                    <span class="close-modal">&times;</span>
-                </div>
-                <div class="modal-body">
-                    <form id="editUserForm" method="POST">
-                        <input type="hidden" id="userId" name="userId">
+                <!-- Hidden form for POST actions -->
+                <form id="actionForm" method="POST" style="display: none;">
+                    <!-- No inputs needed by default, they will be added dynamically if required -->
+                </form>
 
-                        <div class="form-group">
-                            <label for="name">Name</label>
-                            <input type="text" id="name" name="name" required>
-                        </div>
+                <!-- Dropdown Menu Script -->
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const dropdowns = document.querySelectorAll('.dropdown');
 
-                        <div class="form-group">
-                            <label for="address">Address</label>
-                            <input type="text" id="address" name="address" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="phone">Phone Number</label>
-                            <input type="text" id="phone" name="phone" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="hobbies">Hobbies</label>
-                            <input type="text" id="hobbies" name="hobbies">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="birthdate">Birthdate</label>
-                            <input type="date" id="birthdate" name="birthdate" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="gender">Gender</label>
-                            <select id="gender" name="gender" required>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                            </select>
-                        </div>
-
-                        <div class="form-actions">
-                            <button type="button" class="cancel-btn">Cancel</button>
-                            <button type="submit" class="save-btn">Save Changes</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <footer class="footer">
-            <div class="logo sansation-bold" style="margin-bottom: 1rem;">DBS<span>401</span></div>
-            <ul class="footer-links">
-                <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                <li><a href="#"><i class="fab fa-linkedin"></i></a></li>
-                <li><a href="#"><i class="fab fa-github"></i></a></li>
-                <li><a href="#"><i class="fab fa-discord"></i></a></li>
-            </ul>
-            <p>© 2023 Database Security 401. All rights reserved.</p>
-            <p class="security-note"><i class="fas fa-shield-alt"></i> This page implements DBS401 security standards
-            </p>
-        </footer>
-
-        <!-- Hidden form for POST actions -->
-        <form id="actionForm" method="POST" style="display: none;">
-            <!-- No inputs needed by default, they will be added dynamically if required -->
-        </form>
-
-        <!-- Dropdown Menu Script -->
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const dropdowns = document.querySelectorAll('.dropdown');
-
-                // Toggle dropdown on click
-                dropdowns.forEach(dropdown => {
-                    const toggleBtn = dropdown.querySelector('.dropdown-toggle');
-
-                    toggleBtn.addEventListener('click', function (e) {
-                        e.preventDefault();
-                        dropdown.classList.toggle('active');
-                        dropdown.querySelector('.dropdown-menu').classList.toggle('show');
-
-                        // Close other dropdowns
-                        dropdowns.forEach(otherDropdown => {
-                            if (otherDropdown !== dropdown && otherDropdown.classList.contains('active')) {
-                                otherDropdown.classList.remove('active');
-                                otherDropdown.querySelector('.dropdown-menu').classList.remove('show');
-                            }
-                        });
-                    });
-                });
-
-                // Close dropdowns when clicking outside
-                document.addEventListener('click', function (e) {
-                    if (!e.target.closest('.dropdown')) {
+                        // Toggle dropdown on click
                         dropdowns.forEach(dropdown => {
-                            dropdown.classList.remove('active');
-                            dropdown.querySelector('.dropdown-menu').classList.remove('show');
+                            const toggleBtn = dropdown.querySelector('.dropdown-toggle');
+
+                            toggleBtn.addEventListener('click', function (e) {
+                                e.preventDefault();
+                                dropdown.classList.toggle('active');
+                                dropdown.querySelector('.dropdown-menu').classList.toggle('show');
+
+                                // Close other dropdowns
+                                dropdowns.forEach(otherDropdown => {
+                                    if (otherDropdown !== dropdown && otherDropdown.classList.contains('active')) {
+                                        otherDropdown.classList.remove('active');
+                                        otherDropdown.querySelector('.dropdown-menu').classList.remove('show');
+                                    }
+                                });
+                            });
                         });
-                    }
-                });
-            });
-        </script>
 
-        <!-- Simple JavaScript for interactivity -->
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const searchInput = document.getElementById('userSearch');
-                const genderFilter = document.getElementById('genderFilter');
-                const tableRows = document.querySelectorAll('#users_table tbody tr');
-                const actionForm = document.getElementById('actionForm');
-
-                // Search functionality
-                searchInput.addEventListener('input', filterTable);
-                genderFilter.addEventListener('change', filterTable);
-
-                // Export button functionality (updated to use server-side endpoint)
-                document.querySelector('.export-btn').addEventListener('click', function () {
-                    // Get current filter values
-                    const searchTerm = searchInput.value;
-                    const gender = genderFilter.value;
-
-                    // Create export URL with query parameters for current filters
-                    let exportUrl = `/user/export?`;
-                    if (searchTerm) {
-                        exportUrl += `searchTerm=${encodeURIComponent(searchTerm)}&`;
-                    }
-                    if (gender) {
-                        exportUrl += `gender=${encodeURIComponent(gender)}`;
-                    }
-
-                    // Trigger file download by navigating to the export URL
-                    window.location.href = exportUrl;
-                });
-
-                function filterTable() {
-                    const searchTerm = searchInput.value.toLowerCase();
-                    const genderValue = genderFilter.value;
-
-                    tableRows.forEach(row => {
-                        const name = row.cells[0].textContent.toLowerCase(); // Column index shifted (was 1)
-                        const gender = row.cells[5].textContent.trim(); // Column index shifted (was 6)
-
-                        const matchesSearch = name.includes(searchTerm);
-                        const matchesGender = genderValue === '' || gender.includes(genderValue);
-
-                        if (matchesSearch && matchesGender) {
-                            row.style.display = '';
-                        } else {
-                            row.style.display = 'none';
-                        }
-                    });
-                }
-
-                // Highlight row on hover
-                tableRows.forEach(row => {
-                    row.addEventListener('mouseover', function () {
-                        this.classList.add('highlight');
-                    });
-
-                    row.addEventListener('mouseout', function () {
-                        this.classList.remove('highlight');
-                    });
-                });
-
-                // Phone number visibility toggle
-                document.querySelectorAll('.toggle-visibility').forEach(button => {
-                    button.addEventListener('click', function () {
-                        const phoneContainer = this.parentElement;
-                        const maskedValue = phoneContainer.querySelector('.masked-value');
-                        const actualValue = phoneContainer.querySelector('.actual-value');
-                        const eyeIcon = this.querySelector('i');
-
-                        if (maskedValue.style.display === 'none') {
-                            // Show masked value, hide actual value
-                            maskedValue.style.display = '';
-                            actualValue.style.display = 'none';
-                            eyeIcon.classList.remove('fa-eye-slash');
-                            eyeIcon.classList.add('fa-eye');
-                        } else {
-                            // Hide masked value, show actual value
-                            maskedValue.style.display = 'none';
-                            actualValue.style.display = '';
-                            eyeIcon.classList.remove('fa-eye');
-                            eyeIcon.classList.add('fa-eye-slash');
-                        }
-                    });
-                });
-
-                // Add event listeners to edit buttons
-                document.querySelectorAll('.edit-btn').forEach(button => {
-                    button.addEventListener('click', function () {
-                        // Get the closest table row
-                        const row = this.closest('tr');
-
-                        // Extract user data from the row - now using data attribute for ID
-                        const userId = row.dataset.userId;
-                        const name = row.cells[0].textContent.trim();
-                        const address = row.cells[1].textContent.trim();
-                        const phone = row.querySelector('.actual-value').textContent.trim();
-                        const hobbies = row.cells[3].textContent.trim();
-                        const birthdate = row.cells[4].textContent.trim();
-
-                        // Get clean gender value (removing any extra spaces or icons)
-                        let genderText = row.cells[5].textContent.trim();
-                        // Extract just "Male" or "Female" from the text
-                        let gender = genderText.includes('Male') ? 'Male' : 'Female';
-
-                        console.log('Extracted gender:', gender);
-
-                        // Fill the modal form with user data
-                        document.getElementById('userId').value = userId;
-                        document.getElementById('name').value = name;
-                        document.getElementById('address').value = address;
-                        document.getElementById('phone').value = phone;
-                        document.getElementById('hobbies').value = hobbies;
-
-                        // Convert date format for the date input (MM/DD/YYYY to YYYY-MM-DD)
-                        try {
-                            const dateParts = birthdate.split('/');
-                            if (dateParts.length === 3) {
-                                const formattedDate = `${dateParts[2]}-${dateParts[0].padStart(2, '0')}-${dateParts[1].padStart(2, '0')}`;
-                                document.getElementById('birthdate').value = formattedDate;
+                        // Close dropdowns when clicking outside
+                        document.addEventListener('click', function (e) {
+                            if (!e.target.closest('.dropdown')) {
+                                dropdowns.forEach(dropdown => {
+                                    dropdown.classList.remove('active');
+                                    dropdown.querySelector('.dropdown-menu').classList.remove('show');
+                                });
                             }
-                        } catch (e) {
-                            console.error("Error formatting date:", e);
+                        });
+                    });
+                </script>
+
+                <!-- Simple JavaScript for interactivity -->
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const searchInput = document.getElementById('userSearch');
+                        const genderFilter = document.getElementById('genderFilter');
+                        const tableRows = document.querySelectorAll('#users_table tbody tr');
+                        const actionForm = document.getElementById('actionForm');
+
+                        // Search functionality
+                        searchInput.addEventListener('input', filterTable);
+                        genderFilter.addEventListener('change', filterTable);
+
+                        // Export button functionality (updated to use server-side endpoint)
+                        document.querySelector('.export-btn').addEventListener('click', function () {
+                            // Get current filter values
+                            const searchTerm = searchInput.value;
+                            const gender = genderFilter.value;
+
+                            // Create export URL with query parameters for current filters
+                            let exportUrl = `/user/export?`;
+                            if (searchTerm) {
+                                exportUrl += `searchTerm=${encodeURIComponent(searchTerm)}&`;
+                            }
+                            if (gender) {
+                                exportUrl += `gender=${encodeURIComponent(gender)}`;
+                            }
+
+                            // Trigger file download by navigating to the export URL
+                            window.location.href = exportUrl;
+                        });
+
+                        function filterTable() {
+                            const searchTerm = searchInput.value.toLowerCase();
+                            const genderValue = genderFilter.value;
+
+                            tableRows.forEach(row => {
+                                const name = row.cells[0].textContent.toLowerCase(); // Column index shifted (was 1)
+                                const gender = row.cells[5].textContent.trim(); // Column index shifted (was 6)
+
+                                const matchesSearch = name.includes(searchTerm);
+                                const matchesGender = genderValue === '' || gender.includes(genderValue);
+
+                                if (matchesSearch && matchesGender) {
+                                    row.style.display = '';
+                                } else {
+                                    row.style.display = 'none';
+                                }
+                            });
                         }
 
-                        // Set form action
-                        document.getElementById('editUserForm').setAttribute('action', `/user/edit/${userId}`);
-                        document.getElementById('gender').value = gender;
+                        // Highlight row on hover
+                        tableRows.forEach(row => {
+                            row.addEventListener('mouseover', function () {
+                                this.classList.add('highlight');
+                            });
 
-                        // Show the modal
-                        document.getElementById('editUserModal').style.display = 'block';
+                            row.addEventListener('mouseout', function () {
+                                this.classList.remove('highlight');
+                            });
+                        });
+
+                        // Phone number visibility toggle
+                        document.querySelectorAll('.toggle-visibility').forEach(button => {
+                            button.addEventListener('click', function () {
+                                const phoneContainer = this.parentElement;
+                                const maskedValue = phoneContainer.querySelector('.masked-value');
+                                const actualValue = phoneContainer.querySelector('.actual-value');
+                                const eyeIcon = this.querySelector('i');
+
+                                if (maskedValue.style.display === 'none') {
+                                    // Show masked value, hide actual value
+                                    maskedValue.style.display = '';
+                                    actualValue.style.display = 'none';
+                                    eyeIcon.classList.remove('fa-eye-slash');
+                                    eyeIcon.classList.add('fa-eye');
+                                } else {
+                                    // Hide masked value, show actual value
+                                    maskedValue.style.display = 'none';
+                                    actualValue.style.display = '';
+                                    eyeIcon.classList.remove('fa-eye');
+                                    eyeIcon.classList.add('fa-eye-slash');
+                                }
+                            });
+                        });
+
+                        // Add event listeners to edit buttons
+                        document.querySelectorAll('.edit-btn').forEach(button => {
+                            button.addEventListener('click', function () {
+                                // Get the closest table row
+                                const row = this.closest('tr');
+
+                                // Extract user data from the row - now using data attribute for ID
+                                const userId = row.dataset.userId;
+                                const name = row.cells[0].textContent.trim();
+                                const address = row.cells[1].textContent.trim();
+                                const phone = row.querySelector('.actual-value').textContent.trim();
+                                const hobbies = row.cells[3].textContent.trim();
+                                const birthdate = row.cells[4].textContent.trim();
+
+                                // Get clean gender value (removing any extra spaces or icons)
+                                let genderText = row.cells[5].textContent.trim();
+                                // Extract just "Male" or "Female" from the text
+                                let gender = genderText.includes('Male') ? 'Male' : 'Female';
+
+                                console.log('Extracted gender:', gender);
+
+                                // Fill the modal form with user data
+                                document.getElementById('userId').value = userId;
+                                document.getElementById('name').value = name;
+                                document.getElementById('address').value = address;
+                                document.getElementById('phone').value = phone;
+                                document.getElementById('hobbies').value = hobbies;
+
+                                // Convert date format for the date input (MM/DD/YYYY to YYYY-MM-DD)
+                                try {
+                                    const dateParts = birthdate.split('/');
+                                    if (dateParts.length === 3) {
+                                        const formattedDate = `${dateParts[2]}-${dateParts[0].padStart(2, '0')}-${dateParts[1].padStart(2, '0')}`;
+                                        document.getElementById('birthdate').value = formattedDate;
+                                    }
+                                } catch (e) {
+                                    console.error("Error formatting date:", e);
+                                }
+
+                                // Set form action
+                                document.getElementById('editUserForm').setAttribute('action', `/user/edit/${userId}`);
+                                document.getElementById('gender').value = gender;
+
+                                // Show the modal
+                                document.getElementById('editUserModal').style.display = 'block';
+                            });
+                        });
+
+                        // Close modal when clicking the X button
+                        document.querySelector('.close-modal').addEventListener('click', function () {
+                            document.getElementById('editUserModal').style.display = 'none';
+                        });
+
+                        // Close modal when clicking the Cancel button
+                        document.querySelector('.cancel-btn').addEventListener('click', function () {
+                            document.getElementById('editUserModal').style.display = 'none';
+                        });
+
+                        // Close modal when clicking outside the modal content
+                        window.addEventListener('click', function (event) {
+                            const modal = document.getElementById('editUserModal');
+                            if (event.target === modal) {
+                                modal.style.display = 'none';
+                            }
+                        });
+
+                        // Horizontal scroll indicator for table
+                        const tableContainer = document.querySelector('.scrollable-table-container');
+                        const scrollIndicator = document.querySelector('.scroll-indicator');
+
+                        function checkScrollability() {
+                            if (tableContainer.scrollWidth > tableContainer.clientWidth) {
+                                // Table is scrollable
+                                scrollIndicator.classList.add('visible');
+                            } else {
+                                // Table is not scrollable
+                                scrollIndicator.classList.remove('visible');
+                            }
+                        }
+
+                        window.addEventListener('resize', checkScrollability);
+                        checkScrollability(); // Check on load
+
+                        // Hide indicator after user has scrolled
+                        tableContainer.addEventListener('scroll', function () {
+                            scrollIndicator.classList.remove('visible');
+                        }, { once: true });
+
+                        // Extra safety - hide after a timeout
+                        setTimeout(function () {
+                            scrollIndicator.classList.remove('visible');
+                        }, 1000);
                     });
-                });
-
-                // Close modal when clicking the X button
-                document.querySelector('.close-modal').addEventListener('click', function () {
-                    document.getElementById('editUserModal').style.display = 'none';
-                });
-
-                // Close modal when clicking the Cancel button
-                document.querySelector('.cancel-btn').addEventListener('click', function () {
-                    document.getElementById('editUserModal').style.display = 'none';
-                });
-
-                // Close modal when clicking outside the modal content
-                window.addEventListener('click', function (event) {
-                    const modal = document.getElementById('editUserModal');
-                    if (event.target === modal) {
-                        modal.style.display = 'none';
-                    }
-                });
-
-                // Horizontal scroll indicator for table
-                const tableContainer = document.querySelector('.scrollable-table-container');
-                const scrollIndicator = document.querySelector('.scroll-indicator');
-
-                function checkScrollability() {
-                    if (tableContainer.scrollWidth > tableContainer.clientWidth) {
-                        // Table is scrollable
-                        scrollIndicator.classList.add('visible');
-                    } else {
-                        // Table is not scrollable
-                        scrollIndicator.classList.remove('visible');
-                    }
-                }
-
-                window.addEventListener('resize', checkScrollability);
-                checkScrollability(); // Check on load
-
-                // Hide indicator after user has scrolled
-                tableContainer.addEventListener('scroll', function () {
-                    scrollIndicator.classList.remove('visible');
-                }, { once: true });
-
-                // Extra safety - hide after a timeout
-                setTimeout(function () {
-                    scrollIndicator.classList.remove('visible');
-                }, 1000);
-            });
-        </script>
+                </script>
 </body>
 
 </html>

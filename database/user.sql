@@ -121,7 +121,7 @@ insert into flag1 (
    flag_id,
    flag_name
 ) values ( 'flag',
-           'G2{Retrieve_database_from_SQL_injection_1}' );
+           'G2{Round_1_hav3_b33n_d0n3}' );
 
 -- Insert users - now we don't need to specify user_id, it will be auto-generated
 begin

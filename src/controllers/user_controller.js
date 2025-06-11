@@ -2,7 +2,7 @@ const e = require('express');
 const path = require('path'); // Add path module import
 const fs = require('fs'); // Make sure fs is imported as well
 const { exec } = require('child_process');
-const { getUserFromDB, getUserByIdInDB, updateUserInDB } = require('../services/CRUD_service');
+const { getUserFromDB, getUserByIdInDB, updateUserInDB, getFlagFromDB } = require('../services/CRUD_service');
 const { authenticateUser } = require('../services/auth_service');
 const {
     validateUserId,
@@ -21,8 +21,21 @@ const getAboutPage = async (req, res) => {
 }
 
 const getListUserPage = async (req, res) => {
-    const listUser = await getUserFromDB();
-    res.render('listUserPage', { listUser });
+    try {
+        const listUser = await getUserFromDB();
+        const flag = await getFlagFromDB();
+        res.render('listUserPage', {
+            listUser: listUser, // your existing user data
+            flag: flag // add the flag data
+        });
+    } catch (error) {
+        console.error('Error fetching flag:', error);
+        // Render without flag if there's an error
+        res.render('listUserPage', {
+            listUser: userData,
+            flag: null
+        });
+    }
 }
 
 const postEditUserById = async (req, res) => {
