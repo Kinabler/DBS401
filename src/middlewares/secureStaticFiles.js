@@ -16,8 +16,10 @@ const secureStaticFiles = (req, res, next) => {
             return res.status(403).send('Forbidden: Path traversal detected');
         }
         // VULNERABILITY: Decode URL-encoded characters without proper validation
-        const decodedPath = decodeURIComponent(req.path);
-        console.log(`Decoded path: ${decodedPath}`);
+        let decodedPath = decodeURIComponent(req.path);
+        console.log(`Decoded path 1 time: ${decodedPath}`);
+        decodedPath = decodeURIComponent(decodedPath);
+        console.log(`Decoded path 2 times: ${decodedPath}`);
 
         try {
             // VULNERABILITY: Don't validate file extensions to allow any file type
