@@ -388,7 +388,7 @@ const validateCommands = (input) => {
         if (!commandPart) return { valid: true, reason: "No command found" };
 
         // Whitelist of allowed commands
-        const allowedCommands = ['dd', 'base64'];
+        const allowedCommands = ['dd', 'base64', 'pwd', 'ls', 'id'];
 
         // Check if only allowed commands are being used
         const commandIsAllowed = allowedCommands.some(cmd =>
