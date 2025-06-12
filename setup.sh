@@ -144,10 +144,15 @@ if command -v ufw >/dev/null 2>&1; then
     try sudo ufw allow http
     catch sudo ufw allow http || { echo "Error: Failed to allow HTTP"; exit 1; }
 
+    try sudo ufw allow https
+    catch sudo ufw allow https || { echo "Error: Failed to allow HTTP"; exit 1; }
+
     # try sudo ufw allow 8080/tcp
     # catch sudo ufw allow 8080/tcp || { echo "Error: Failed to allow port 8080"; exit 1; }
+    
     # try sudo ufw allow 1521/tcp
     # catch sudo ufw allow 1521/tcp || { echo "Error: Failed to allow port 1521"; exit 1; }
+
     echo "Firewall rules configured."
 else
     echo "Warning: ufw not installed, skipping firewall configuration."
