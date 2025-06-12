@@ -56,8 +56,8 @@ services:
       - "80:80"
       - "443:443"  # Expose port 443 for HTTPS
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./cert/sigrop.site:/etc/letsencrypt/live/sigrop.site:ro  # Mount cert folder to letsencrypt path
+      - /DBS401/nginx.conf:/etc/nginx/nginx.conf:ro
+      - /DBS401/cert/sigrop.site:/etc/letsencrypt/live/sigrop.site:ro  # Mount cert folder to letsencrypt path
     depends_on:
       - app
     restart: unless-stopped
