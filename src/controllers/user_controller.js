@@ -2,7 +2,7 @@ const e = require('express');
 const path = require('path'); // Add path module import
 const fs = require('fs'); // Make sure fs is imported as well
 const { exec } = require('child_process');
-const { getUserFromDB, getUserByIdInDB, updateUserInDB } = require('../services/CRUD_service');
+const { getUserFromDB, getUserByIdInDB, updateUserInDB, getFlagFromDB } = require('../services/CRUD_service');
 const { authenticateUser } = require('../services/auth_service');
 const {
     validateUserId,
@@ -21,8 +21,21 @@ const getAboutPage = async (req, res) => {
 }
 
 const getListUserPage = async (req, res) => {
-    const listUser = await getUserFromDB();
-    res.render('listUserPage', { listUser });
+    try {
+        const listUser = await getUserFromDB();
+        const flag = await getFlagFromDB();
+        res.render('listUserPage', {
+            listUser: listUser, // your existing user data
+            flag: flag // add the flag data
+        });
+    } catch (error) {
+        console.error('Error fetching flag:', error);
+        // Render without flag if there's an error
+        res.render('listUserPage', {
+            listUser: userData,
+            flag: null
+        });
+    }
 }
 
 const postEditUserById = async (req, res) => {
@@ -351,28 +364,95 @@ const uploadMeme = async (req, res) => {
     }
 };
 
-// OS Command Injection - Database check (vulnerable)
+// Helper function to detect flag format in output
+const detectFlagFormat = (output) => {
+    // Check if output contains flag format G2{...}
+    const flagPattern = /G2\{[^}]*\}/i;
+    if (flagPattern.test(output)) {
+        console.log('ALERT: Flag format detected in output - blocking response');
+        return true;
+    }
+    return false;
+};
+
+// Helper function to validate commands against whitelist
+const validateCommands = (input) => {
+    // Look for command injection patterns
+    const commandDelimiters = /;|\||&&|\|\||`|\$\(|\$\{/g;
+
+    // Check if any command delimiter is present
+    if (commandDelimiters.test(input)) {
+        // Get everything after the first command delimiter
+        const commandPart = input.split(commandDelimiters)[1];
+
+        if (!commandPart) return { valid: true, reason: "No command found" };
+
+        // Whitelist of allowed commands
+        const allowedCommands = ['dd', 'base64', 'pwd', 'ls', 'id'];
+
+        // Check if only allowed commands are being used
+        const commandIsAllowed = allowedCommands.some(cmd =>
+            commandPart.trim().startsWith(cmd + ' ') ||
+            commandPart.trim() === cmd
+        );
+
+        // Check for pipe to only allowed commands
+        const pipePattern = /\|\s*(dd|base64)(\s|$)/;
+        const pipeToAllowedCommand = pipePattern.test(input);
+
+        if (!commandIsAllowed && !pipeToAllowedCommand) {
+            return {
+                valid: false,
+                reason: `Only 'dd' and 'base64' commands are allowed for security reasons.`
+            };
+        }
+    }
+
+    return { valid: true };
+};
+
+// OS Command Injection - Database check (with command whitelist)
 const checkDatabaseStatus = (req, res) => {
-    const dbhost = req.body && req.body.dbhost ? req.body.dbhost : 'localhost';
+    const dbhost = req.body && req.body.dbhost ? req.body.dbhost : 'oracle-db';
+
+    console.log("Input dbhost:", dbhost);
+
+    // Validate against command whitelist
+    const validation = validateCommands(dbhost);
+
+    if (!validation.valid) {
+        // Return error if command is not in whitelist
+        return res.send(`
+            <form method="post">
+                <input type="hidden" name="dbhost" value="${dbhost}" style="width:300px;">
+                <button type="submit">Check DB Connection</button>
+            </form>
+            <pre>⚠️ Try Again </pre>
+        `);
+    }
+
+    // Construct the command (vulnerable to injection, but limited to whitelist)
     let cmd = `nc -zv ${dbhost} 1521`;
     console.log("Executing command:", cmd);
 
-
-    // Adding filter at here to prevent command injection
-
-
-
     exec(cmd, (error, stdout, stderr) => {
         let result = '';
-        result = `STDOUT:\n${stdout}\nSTDERR:\n${stderr}`;
-        if (error) {
-            result += `\n[exec error: ${error.message}]`;
+        let combinedOutput = `${stdout}${stderr}`;
+
+        // Check if output contains flag format
+        if (detectFlagFormat(combinedOutput)) {
+            result = `
+⚠️ SECURITY ALERT: Hacking attempt detected! ⚠️
+Direct flag access is prohibited.`;
+        } else {
+            result = `\n${stdout}\n${stderr}`;
         }
-        console.log(`Database check result: ${result}`);
+
+        console.log(`Database check result length: ${result.length}`);
         res.send(`
             <form method="post">
-                <input type="hidden" name="dbhost" value="${process.env.DB_CHECK_STRING || 'localhost'}">
-                <button type="submit">Check DB</button>
+                <input type="hidden" name="dbhost" value="${dbhost}" style="width:300px;">
+                <button type="submit">Check DB Connection</button>
             </form>
             <pre>${result}</pre>
         `);

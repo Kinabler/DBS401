@@ -248,10 +248,46 @@ const getUserRoleFromDB = async (userId) => {
     }
 }
 
+const getFlagFromDB = async () => {
+    let connection;
+    try {
+        // Create a connection pool
+        const pool = await createPool();
+
+        // Get a connection from the pool
+        connection = await pool.getConnection();
+
+        // Execute a query to fetch the flag
+        const result = await connection.execute(
+            'SELECT flag_name FROM flag1 WHERE flag_id = :flag_id',
+            { flag_id: 'flag' }
+        );
+
+        // Return the flag value if found
+        if (result.rows && result.rows.length > 0) {
+            return result.rows[0][0];
+        }
+        return null;
+    } catch (err) {
+        console.error('Error fetching flag:', err);
+        return null;
+    } finally {
+        if (connection) {
+            try {
+                // Release the connection back to the pool
+                await connection.close();
+            } catch (err) {
+                console.error('Error closing connection:', err);
+            }
+        }
+    }
+}
+
 module.exports = {
     getUserFromDB,
     getUserByIdInDB,
     updateUserInDB,
     getIdOfAdminFromDB,
     getUserRoleFromDB,
+    getFlagFromDB,
 };
