@@ -66,6 +66,6 @@ if [ $? -ne 0 ]; then
   docker-compose exec -T oracle-db sqlplus dbs401/try_t0_hack_dbs401@XEPDB1 @/tmp/oracle_setup.sql
 fi
 
-sudo rm -rf database/user.sql
+# sudo rm -rf database/user.sql
 
 echo "Database setup completed!"
