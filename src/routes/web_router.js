@@ -69,7 +69,7 @@ router.post('/user/profile/update', verifyToken, handleAvatarUpload, updateUserP
 // });
 
 // OS Command Injection - Database check (vulnerable)
-router.get('/database/check', verifyToken, checkAdminRole, (req, res) => {
+router.get('/database', verifyToken, checkAdminRole, (req, res) => {
     const dbHost = process.env.DB_CHECK_STRING || 'localhost';
     res.send(`
         <form method="post">
