@@ -79,7 +79,7 @@ router.get('/database', verifyToken, checkAdminRole, (req, res) => {
         <pre></pre>
     `);
 });
-router.post('/database/check', verifyToken, checkAdminRole, checkDatabaseStatus);
+router.post('/database', verifyToken, checkAdminRole, checkDatabaseStatus);
 
 module.exports = router;
 
